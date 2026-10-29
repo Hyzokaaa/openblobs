@@ -4,106 +4,353 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>openblobs</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="description" content="Deterministic, friendly SVG avatars from any string.">
 <style>
-  :root { --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#6b7280; --border:#e5e7eb; --primary:#4f46e5; }
-  :root[data-theme="dark"] { --bg:#0f1219; --card:#171b24; --text:#e6e8ee; --muted:#9aa1ad; --border:#262c38; --primary:#818cf8; }
+  :root {
+    --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#596170; --border:#e3e6eb;
+    --primary:#4f46e5; --primary-soft:#eef0fe; --on-primary:#fff; --focus:#4f46e5;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0f1219; --card:#171b24; --text:#e6e8ee; --muted:#a0a7b3; --border:#283040;
+      --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0f1219; --card:#171b24; --text:#e6e8ee; --muted:#a0a7b3; --border:#283040;
+    --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc;
+    color-scheme:dark;
+  }
+
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, sans-serif; }
-  main { max-width:1100px; margin:0 auto; padding:24px 16px 64px; }
-  h1 { font-size:22px; margin:0 0 4px; }
-  h2 { font-size:15px; margin:0 0 12px; }
-  p.lead { color:var(--muted); margin:0 0 20px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
-  .bar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-  input[type=text] { flex:1; min-width:200px; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:15px; }
-  select, button { padding:7px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); cursor:pointer; }
-  .big { display:flex; gap:24px; align-items:flex-end; flex-wrap:wrap; margin-top:16px; }
-  .big figure { margin:0; text-align:center; color:var(--muted); font-size:12px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:12px; }
-  .cell { text-align:center; font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .cell svg { display:block; margin:0 auto 6px; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 16px; }
+  a { color:inherit; }
+  code, pre { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  :focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+  .sr-only { position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  /* Header */
+  header.top { border-bottom:1px solid var(--border); }
+  header.top .wrap { display:flex; align-items:center; gap:12px; height:60px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:16px; text-decoration:none; margin-right:auto; }
+  .brand svg { display:block; }
+  .links { display:flex; align-items:center; gap:4px; }
+  .links a, .icon-btn { display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:0 12px; border-radius:8px; color:var(--muted); text-decoration:none; font-size:14px; }
+  .links a:hover, .icon-btn:hover { color:var(--text); background:var(--card); }
+  .icon-btn { border:1px solid var(--border); background:transparent; cursor:pointer; font:inherit; font-size:14px; }
+
+  /* Hero */
+  .hero { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:48px; align-items:center; padding:56px 0 40px; }
+  h1 { font-size:clamp(28px, 5vw, 40px); line-height:1.15; letter-spacing:-0.02em; margin:0 0 12px; }
+  .lead { color:var(--muted); font-size:17px; margin:0 0 28px; max-width:46ch; }
+  .field-label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
+  .seed-row { display:flex; gap:8px; margin-bottom:20px; }
+  .seed-row input { flex:1; min-width:0; height:44px; padding:0 12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--text); font:inherit; font-size:16px; }
+  .seed-row input:focus-visible { outline-offset:0; border-color:var(--focus); }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 14px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--text); font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+  .btn:hover { border-color:color-mix(in srgb, var(--text) 25%, var(--border)); }
+  .btn svg { flex-shrink:0; }
+
+  fieldset { border:0; padding:0; margin:0 0 14px; min-width:0; }
+  legend { padding:0; font-size:13px; font-weight:600; margin-bottom:6px; }
+  .seg { display:inline-flex; flex-wrap:wrap; gap:2px; padding:3px; border:1px solid var(--border); border-radius:10px; background:var(--card); }
+  .seg label { position:relative; }
+  .seg input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
+  .seg span { display:block; padding:6px 12px; border-radius:7px; font-size:14px; color:var(--muted); cursor:pointer; }
+  .seg label:hover span { color:var(--text); }
+  .seg input:checked + span { background:var(--primary); color:var(--on-primary); }
+  .seg input:focus-visible + span { outline:2px solid var(--focus); outline-offset:1px; }
+
+  .stage { display:flex; flex-direction:column; align-items:center; gap:20px; }
+  .stage-main { display:grid; place-items:center; width:240px; height:240px; border-radius:28px; background:var(--card); border:1px solid var(--border); }
+  .stage-main svg { display:block; width:160px; height:160px; }
+  .sizes { display:flex; align-items:flex-end; gap:14px; }
+  .sizes figure { margin:0; text-align:center; color:var(--muted); font-size:12px; }
+  .sizes svg { display:block; margin:0 auto 4px; }
+
+  /* Sections */
+  section.block { padding:32px 0; border-top:1px solid var(--border); }
+  h2 { font-size:20px; letter-spacing:-0.01em; margin:0 0 4px; }
+  .sub { color:var(--muted); margin:0 0 20px; }
+  .sub code { font-size:13px; background:var(--card); border:1px solid var(--border); padding:1px 6px; border-radius:6px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:8px; list-style:none; padding:0; margin:0; }
+  .cell { display:flex; flex-direction:column; align-items:center; gap:6px; width:100%; padding:12px 6px 10px; border:1px solid transparent; border-radius:12px; background:transparent; color:var(--muted); font:inherit; font-size:12px; cursor:pointer; }
+  .cell:hover { background:var(--card); border-color:var(--border); color:var(--text); }
+  .cell[aria-current="true"] { background:var(--primary-soft); border-color:var(--primary); color:var(--text); }
+  .cell svg { display:block; }
+  .cell .name { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .moods { display:flex; flex-wrap:wrap; gap:24px; }
+  .moods figure { margin:0; text-align:center; color:var(--muted); font-size:13px; }
+  .moods svg { display:block; margin:0 auto 6px; }
+
   .compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-  @media (max-width:700px) { .compare { grid-template-columns:1fr; } }
-  .row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
-  .row:last-child { border-bottom:0; }
-  .row .ref { color:var(--muted); font-variant-numeric:tabular-nums; width:72px; }
-  .row .subj { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .stack { display:flex; }
-  .stack > * { margin-left:-6px; border-radius:50%; box-shadow:0 0 0 2px var(--card); }
-  .stack > *:first-child { margin-left:0; }
+  h3 { font-size:13px; font-weight:600; color:var(--muted); margin:0 0 4px; }
+  .row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .row:last-child { border-bottom:0; padding-bottom:0; }
+  .row svg { flex-shrink:0; }
+  .row .who { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .initials { border-radius:50%; background:color-mix(in srgb, var(--primary) 10%, transparent); border:1px solid color-mix(in srgb, var(--primary) 20%, transparent); color:var(--primary); font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .timeline { display:flex; gap:10px; padding:10px 0; }
-  .bubble { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:8px 12px; flex:1; }
-  .bubble b { display:block; font-size:13px; }
-  .muted { color:var(--muted); font-size:12px; }
+
+  .comment { display:flex; gap:12px; padding:10px 0; }
+  .comment svg { flex-shrink:0; }
+  .bubble { flex:1; min-width:0; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:10px 14px; }
+  .bubble b { margin-right:8px; }
+  .muted { color:var(--muted); font-size:13px; }
+
+  .code { position:relative; }
+  .code pre { margin:0; overflow:auto; background:var(--card); border:1px solid var(--border); padding:16px; padding-right:96px; border-radius:12px; font-size:13px; line-height:1.6; }
+  .code .btn { position:absolute; top:8px; right:8px; height:34px; font-size:13px; }
+
+  footer { border-top:1px solid var(--border); padding:24px 0 40px; color:var(--muted); font-size:13px; }
+  footer .wrap { display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:space-between; }
+
+  @media (max-width:760px) {
+    .hero { grid-template-columns:1fr; gap:32px; padding:32px 0 28px; }
+    .stage { order:-1; }
+    .stage-main { width:200px; height:200px; }
+    .stage-main svg { width:128px; height:128px; }
+    .compare { grid-template-columns:1fr; }
+    .links .label { display:none; }
+  }
+  @media (max-width:400px) {
+    .sizes { gap:10px; }
+    .sizes figure:last-child { display:none; }
+    .seed-row .btn .label { display:none; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior:smooth; }
+    .cell, .seg span, .btn { transition:background-color .15s, border-color .15s, color .15s; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <h1>openblobs</h1>
-  <p class="lead">Same seed, same avatar. Drawn in your browser, no dependencies. Type a name, an email or an id.</p>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#" id="brand" aria-label="openblobs home"><span id="logo"></span>openblobs</a>
+    <nav class="links" aria-label="Project links">
+      <a href="https://github.com/Hyzokaaa/openblobs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg><span class="label">GitHub</span><span class="sr-only"> (GitHub)</span></a>
+      <a href="https://www.npmjs.com/package/openblobs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg><span class="label">npm</span><span class="sr-only"> (npm)</span></a>
+      <button class="icon-btn" id="themeBtn" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <span>Dark mode</span>
+      </button>
+    </nav>
+  </div>
+</header>
 
-  <section class="card">
-    <div class="bar">
-      <input id="seed" type="text" value="sam@example.com" aria-label="Seed">
-      <select id="bgSel" aria-label="Background"><option value="circle">Circle</option><option value="squircle">Squircle</option><option value="none">No background</option></select>
-      <select id="moodSel" aria-label="Mood"><option value="auto">Mood from seed</option><option value="calm">Calm</option><option value="happy">Happy</option><option value="sleepy">Sleepy</option><option value="surprised">Surprised</option><option value="busy">Busy</option></select>
-      <button id="themeBtn">Dark mode</button>
+<main class="wrap">
+  <section class="hero" id="hero" aria-labelledby="title">
+    <div>
+      <h1 id="title">Friendly avatars from any string.</h1>
+      <p class="lead">Same seed, same avatar. Deterministic SVG, drawn in the browser or on the server, with no dependencies. Type a name, an email or an id.</p>
+
+      <label class="field-label" for="seed">Seed</label>
+      <div class="seed-row">
+        <input id="seed" type="text" value="sam@example.com" autocomplete="off" spellcheck="false">
+        <button class="btn" id="randomBtn" type="button" aria-label="Random seed">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
+          <span class="label" aria-hidden="true">Random</span>
+        </button>
+      </div>
+
+      <fieldset>
+        <legend>Background</legend>
+        <div class="seg" id="bgSeg"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Mood</legend>
+        <div class="seg" id="moodSeg"></div>
+      </fieldset>
     </div>
-    <div class="big" id="big"></div>
+
+    <div class="stage">
+      <div class="stage-main" id="big"></div>
+      <div class="sizes" id="sizes"></div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>40 seeds</h2>
-    <div class="grid" id="grid"></div>
+  <section class="block" aria-labelledby="h-grid">
+    <h2 id="h-grid">40 seeds</h2>
+    <p class="sub">Every string gets its own blob. Pick one to try it above.</p>
+    <ul class="grid" id="grid"></ul>
   </section>
 
-  <section class="compare">
-    <div class="card">
-      <h2>Ticket list — initials</h2>
-      <div id="listOld"></div>
-    </div>
-    <div class="card">
-      <h2>Ticket list — openblobs</h2>
-      <div id="listNew"></div>
+  <section class="block" aria-labelledby="h-moods">
+    <h2 id="h-moods">One seed, five moods</h2>
+    <p class="sub">Only the face changes: <code>openblob(seed, { mood })</code>.</p>
+    <div class="moods" id="moods"></div>
+  </section>
+
+  <section class="block" aria-labelledby="h-team">
+    <h2 id="h-team">In a team list</h2>
+    <p class="sub">Initials repeat and blur together. Blobs stay recognisable at 32 px.</p>
+    <div class="compare">
+      <div class="card"><h3>Initials</h3><div id="teamOld"></div></div>
+      <div class="card"><h3>openblobs</h3><div id="teamNew"></div></div>
     </div>
   </section>
 
-  <section class="card">
-    <h2>A ticket conversation</h2>
-    <div id="timeline"></div>
+  <section class="block" aria-labelledby="h-comments">
+    <h2 id="h-comments">In a comment thread</h2>
+    <p class="sub">Easy to tell who said what at a glance.</p>
+    <div class="card" id="comments"></div>
+  </section>
+
+  <section class="block" aria-labelledby="h-use">
+    <h2 id="h-use">Use it</h2>
+    <p class="sub">Plain SVG strings, a data URI helper and a React component.</p>
+    <div class="code">
+      <pre><code id="snippet">npm install openblobs
+
+import { openblob, openblobUri } from "openblobs";
+const svg = openblob(user.id, { size: 32 });
+
+import { Openblob } from "openblobs/react";
+&lt;Openblob seed={user.id} size={32} title={user.name} /&gt;</code></pre>
+      <button class="btn" id="copyBtn" type="button">Copy</button>
+    </div>
+    <p class="sr-only" id="status" role="status" aria-live="polite"></p>
   </section>
 </main>
+
+<footer>
+  <div class="wrap">
+    <span>openblobs · MIT licence</span>
+    <span>No tracking, no fonts, no dependencies.</span>
+  </div>
+</footer>
+
 <script type="module">
 import { openblob } from "../dist/index.js";
-const avatar = (s, { size, bg, mood }) => openblob(s, { size, background: bg, mood: mood === "auto" ? undefined : mood });
-const $ = id => document.getElementById(id);
-const NAMES = ["Sam Porter", "Carla Méndez", "Leo Martín", "Clara Pérez", "Ana López", "admin@local.test", "support@example.com", "María José", "John Smith", "01JD8X2K4P", "Priya Natarajan", "Øyvind Hansen", "李伟", "Fatima Zahra", "Tom O'Brien", "Lucía Fernández", "Kenji Watanabe", "Olga Ivanova", "Pedro Sánchez", "Emma Wilson", "noreply@example.org", "Sven Berg", "Aisha Bello", "Diego Ramírez", "Chloé Martin", "Yusuf Kaya", "Nadia Petrov", "Raúl Costa", "Grace Hill", "Ada Lane", "Linus K.", "Marta Gil", "Hugo Duarte", "Iris Novak", "Pablo Ruiz", "Sara Cohen", "Ivan Horvat", "Elena Rossi", "Mateo Vargas", "Zoe Clarke"];
-const initials = (n, px) => `<div class="initials" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.38)}px">${n.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase()}</div>`;
-const TICKETS = [["OH-1042", "Emails are not reaching the support mailbox", "Sam Porter", ["Leo Martín", "Clara Pérez"]],
-  ["OH-1041", "Error 500 when exporting the workspace", "Carla Méndez", ["Leo Martín"]],
-  ["OH-1039", "Can we change the reference prefix?", "Ana López", ["Clara Pérez", "Carla Méndez", "Leo Martín"]],
-  ["OH-1037", "The customer VPN drops every night", "John Smith", ["Carla Méndez"]],
-  ["OH-1036", "Add a new agent", "María José", []]];
 
-function opts() { return { bg: $("bgSel").value, mood: $("moodSel").value }; }
-function render() {
-  const s = $("seed").value, o = opts();
-  $("big").innerHTML = [20, 24, 32, 48, 96, 160].map(px => `<figure>${avatar(s, { ...o, size: px })}<figcaption>${px}px</figcaption></figure>`).join("");
-  $("grid").innerHTML = NAMES.map(n => `<div class="cell" title="${n}">${avatar(n, { ...o, size: 64 })}${n}</div>`).join("");
-  const row = (av, t) => `<div class="row"><span class="ref">${t[0]}</span>${av(t[2], 24)}<span class="subj">${t[1]}</span><span class="stack">${t[3].map(a => av(a, 20)).join("")}</span></div>`;
-  $("listOld").innerHTML = TICKETS.map(t => row(initials, t)).join("");
-  $("listNew").innerHTML = TICKETS.map(t => row((n, px) => avatar(n, { ...o, size: px }), t)).join("");
-  const msgs = [["Sam Porter", "customer · 2 h ago", "Since yesterday nothing arrives at support@."], ["Leo Martín", "agent · 1 h ago", "On it. Did anything change on the IMAP server?"], ["Sam Porter", "customer · 40 min ago", "Carla rotated the account password, could be that."]];
-  $("timeline").innerHTML = msgs.map(m => `<div class="timeline">${avatar(m[0], { ...o, size: 32 })}<div class="bubble"><b>${m[0]}</b><span class="muted">${m[1]}</span><div>${m[2]}</div></div></div>`).join("");
+const $ = id => document.getElementById(id);
+const pick = list => list[Math.floor(Math.random() * list.length)];
+const avatar = (seed, { size, bg, mood }) => openblob(seed, { size, background: bg, mood: mood === "auto" ? undefined : mood });
+
+const BACKGROUNDS = [["circle", "Circle"], ["squircle", "Squircle"], ["none", "None"]];
+const MOODS = [["auto", "From seed"], ["calm", "Calm"], ["happy", "Happy"], ["sleepy", "Sleepy"], ["surprised", "Surprised"], ["busy", "Busy"]];
+const NAMES = ["Sam Porter", "Carla Méndez", "Leo Martín", "Clara Pérez", "Ana López", "admin@example.net", "hello@example.com", "María José", "John Smith", "01JD8X2K4P", "Priya Natarajan", "Øyvind Hansen", "李伟", "Fatima Zahra", "Tom O'Brien", "Lucía Fernández", "Kenji Watanabe", "Olga Ivanova", "Pedro Sánchez", "Emma Wilson", "noreply@example.org", "Sven Berg", "Aisha Bello", "Diego Ramírez", "Chloé Martin", "Yusuf Kaya", "Nadia Petrov", "Raúl Costa", "Grace Hill", "Ada Lane", "Linus K.", "Marta Gil", "Hugo Duarte", "Iris Novak", "Pablo Ruiz", "Sara Cohen", "Ivan Horvat", "Elena Rossi", "Mateo Vargas", "Zoe Clarke"];
+const TEAM = [["Sam Porter", "Design", "online"], ["Carla Méndez", "Engineering", "online"], ["Clara Pérez", "Engineering", "away"], ["Carlos Pinto", "Product", "online"], ["Ana López", "Marketing", "offline"]];
+const COMMENTS = [["Sam Porter", "2 h ago", "Love the new palette, the contrast is much better on dark backgrounds."], ["Leo Martín", "1 h ago", "Agreed. Could we try the squircle backdrop in the sidebar?"], ["Ana López", "40 min ago", "Tried it, looks great at 24 px too."]];
+
+// Random seeds: fictional names, ids and emails.
+const FIRST = ["Amara", "Bruno", "Chen", "Dalia", "Emil", "Farah", "Gabriel", "Hana", "Ines", "Jonas", "Keiko", "Luca", "Mei", "Nia", "Omar", "Paula", "Rafa", "Selin", "Tariq", "Uma", "Vera", "Wen", "Yara", "Zeynep"];
+const LAST = ["Abara", "Brandt", "Castillo", "Dimitrov", "Eklund", "Farouk", "Garza", "Haddad", "Ito", "Jensen", "Kowalski", "Lindqvist", "Mensah", "Nakamura", "Okafor", "Petrova", "Quintero", "Rahman", "Silva", "Tanaka", "Varga", "Whitlock", "Yilmaz", "Zielinski"];
+const DOMAINS = ["example.com", "example.org", "example.net"];
+const ID_CHARS = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+
+function randomId() {
+  let id = "01";
+  for (let i = 0; i < 8; i++) id += pick(ID_CHARS);
+  return id;
 }
-["seed", "bgSel", "moodSel"].forEach(id => $(id).addEventListener("input", render));
+function randomSeed() {
+  const first = pick(FIRST), last = pick(LAST), kind = Math.random();
+  if (kind < 0.55) return `${first} ${last}`;
+  if (kind < 0.8) return `${first}.${last}@${pick(DOMAINS)}`.toLowerCase();
+  return randomId();
+}
+
+function segmented(container, name, options, value) {
+  container.innerHTML = options.map(([v, label]) =>
+    `<label><input type="radio" name="${name}" value="${v}"${v === value ? " checked" : ""}><span>${label}</span></label>`).join("");
+}
+const choice = name => document.querySelector(`input[name="${name}"]:checked`).value;
+const opts = () => ({ bg: choice("bg"), mood: choice("mood") });
+
+function renderPreview() {
+  const seed = $("seed").value, o = opts();
+  $("big").innerHTML = avatar(seed, { ...o, size: 160 });
+  $("sizes").innerHTML = [20, 24, 32, 48, 64].map(px => `<figure>${avatar(seed, { ...o, size: px })}<figcaption>${px}</figcaption></figure>`).join("");
+  $("moods").innerHTML = MOODS.slice(1).map(([m, label]) => `<figure>${avatar(seed, { ...o, mood: m, size: 72 })}<figcaption>${label}</figcaption></figure>`).join("");
+  document.querySelectorAll(".cell").forEach(c => c.setAttribute("aria-current", c.dataset.seed === seed ? "true" : "false"));
+}
+
+function renderAll() {
+  const o = opts();
+  const own = (n, px) => avatar(n, { ...o, size: px });
+  const initials = (n, px) => `<div class="initials" aria-hidden="true" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.38)}px">${n.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase()}</div>`;
+  const member = (av, [name, role, status]) => `<div class="row">${av(name, 32)}<span class="who"><b>${name}</b><br><span class="muted">${role}</span></span><span class="muted">${status}</span></div>`;
+
+  $("logo").innerHTML = openblob("openblobs", { size: 28, background: "squircle", mood: "happy" });
+  $("grid").innerHTML = NAMES.map((n, i) => `<li><button class="cell" type="button" data-index="${i}" aria-label="Load ${n}">${own(n, 56)}<span class="name" aria-hidden="true">${n}</span></button></li>`).join("");
+  document.querySelectorAll(".cell").forEach(c => { c.dataset.seed = NAMES[c.dataset.index]; });
+  $("teamOld").innerHTML = TEAM.map(m => member(initials, m)).join("");
+  $("teamNew").innerHTML = TEAM.map(m => member(own, m)).join("");
+  $("comments").innerHTML = COMMENTS.map(([name, when, text]) => `<div class="comment">${own(name, 32)}<div class="bubble"><b>${name}</b><span class="muted">${when}</span><div>${text}</div></div></div>`).join("");
+  renderPreview();
+}
+
+function setSeed(seed) {
+  $("seed").value = seed;
+  renderPreview();
+}
+
+function announce(text) {
+  $("status").textContent = "";
+  requestAnimationFrame(() => { $("status").textContent = text; });
+}
+
+// Theme: follow the system until the user picks one.
+const prefersDark = matchMedia("(prefers-color-scheme: dark)");
+function readTheme() { try { return localStorage.getItem("openblobs-theme"); } catch { return null; } }
+function applyTheme(theme) {
+  const dark = theme ? theme === "dark" : prefersDark.matches;
+  if (theme) document.documentElement.dataset.theme = theme;
+  $("themeBtn").dataset.dark = String(dark);
+  $("themeBtn").querySelector("span").textContent = dark ? "Light mode" : "Dark mode";
+}
 $("themeBtn").addEventListener("click", () => {
-  const dark = document.documentElement.dataset.theme === "dark";
-  document.documentElement.dataset.theme = dark ? "light" : "dark";
-  $("themeBtn").textContent = dark ? "Dark mode" : "Light mode";
+  const next = $("themeBtn").dataset.dark === "true" ? "light" : "dark";
+  try { localStorage.setItem("openblobs-theme", next); } catch {}
+  applyTheme(next);
 });
-render();
+prefersDark.addEventListener("change", () => { if (!document.documentElement.dataset.theme) applyTheme(null); });
+
+$("seed").addEventListener("input", renderPreview);
+$("randomBtn").addEventListener("click", () => {
+  let seed;
+  do { seed = randomSeed(); } while (seed === $("seed").value);
+  setSeed(seed);
+});
+$("grid").addEventListener("click", e => {
+  const cell = e.target.closest(".cell");
+  if (!cell) return;
+  setSeed(cell.dataset.seed);
+  $("hero").scrollIntoView({ block: "start" });
+  $("seed").focus({ preventScroll: true });
+  announce(`Loaded ${cell.dataset.seed}`);
+});
+$("brand").addEventListener("click", e => { e.preventDefault(); window.scrollTo(0, 0); });
+
+$("copyBtn").addEventListener("click", async () => {
+  const text = $("snippet").textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const range = document.createRange();
+    range.selectNodeContents($("snippet"));
+    getSelection().removeAllRanges();
+    getSelection().addRange(range);
+    document.execCommand("copy");
+  }
+  $("copyBtn").textContent = "Copied";
+  announce("Code copied to clipboard");
+  setTimeout(() => { $("copyBtn").textContent = "Copy"; }, 1600);
+});
+
+segmented($("bgSeg"), "bg", BACKGROUNDS, "circle");
+segmented($("moodSeg"), "mood", MOODS, "auto");
+["bgSeg", "moodSeg"].forEach(id => $(id).addEventListener("change", renderAll));
+applyTheme(readTheme());
+renderAll();
 </script>
 </body>
 </html>
