@@ -1,5 +1,7 @@
 # openblobs
 
+**[Live demo](https://hyzokaaa.github.io/openblobs/)**
+
 Friendly, deterministic SVG avatars from any string. The same seed always draws the same little creature: a blob, a pebble, a bean or a drop, sometimes with an antenna, a sprout or a support headset.
 
 - Zero dependencies, runs anywhere JavaScript does (browser, Node, edge).
@@ -48,6 +50,8 @@ Seeds are normalised (Unicode NFC, trimmed, lower-cased) before hashing.
 Within a `GENERATION` the same seed always draws the same avatar. A change that would redraw existing avatars ships as a new major version with a new generation; new options and moods may arrive in minor versions.
 
 ## Demo
+
+Online at https://hyzokaaa.github.io/openblobs/. To run it locally:
 
 ```sh
 npm run build
