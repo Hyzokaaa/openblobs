@@ -1,7 +1,7 @@
 {
   "name": "openblobs",
-  "version": "0.1.0",
-  "description": "Deterministic, friendly SVG avatars from any string. Zero dependencies.",
+  "version": "0.2.0",
+  "description": "Deterministic, friendly SVG avatars from any string, in built-in designs or your own. Zero dependencies.",
   "license": "MIT",
   "author": "Luis Miguel Lagos Xenes",
   "repository": {
@@ -42,7 +42,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "preview": "npm run build && node scripts/preview.mjs",
@@ -66,9 +66,13 @@
   },
   "keywords": [
     "avatar",
+    "avatars",
     "svg",
     "identicon",
     "deterministic",
+    "generative",
+    "profile-picture",
+    "design-system",
     "react"
   ]
 }
