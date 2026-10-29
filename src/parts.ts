@@ -1,9 +1,10 @@
 import { hsl } from "./color.js";
 import { round as r, smoothClosed, type Point } from "./path.js";
-import type { Mood, Palette, Traits } from "./traits.js";
+import type { Random } from "./random.js";
+import type { Palette } from "./palette.js";
+import type { Mood, Traits } from "./traits.js";
 
-export function body(t: Traits, cx: number, cy: number): string {
-  const random = t.random;
+export function body(t: Traits, random: Random, cx: number, cy: number): string {
   if (t.shape === "blob") {
     const n = 6 + Math.floor(random() * 3), rotation = random() * Math.PI * 2, pts: Point[] = [];
     for (let i = 0; i < n; i++) {

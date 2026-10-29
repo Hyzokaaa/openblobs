@@ -6,8 +6,11 @@ export interface OpenblobProps extends OpenblobOptions, Omit<ImgHTMLAttributes<H
   seed: string;
 }
 
-/** Rendered as an `<img>`, so long lists stay cheap and avatars never clash with the page's CSS. */
-export function Openblob({ seed, size, background, mood, title, alt, ...img }: OpenblobProps) {
-  const src = useMemo(() => openblobUri(seed, { background, mood }), [seed, background, mood]);
+/**
+ * Rendered as an `<img>`, so long lists stay cheap and avatars never clash with the page's CSS.
+ * Define a custom `design` once, outside the component, so it is not redrawn on every render.
+ */
+export function Openblob({ seed, size, background, mood, design, title, alt, ...img }: OpenblobProps) {
+  const src = useMemo(() => openblobUri(seed, { background, mood, design }), [seed, background, mood, design]);
   return <img src={src} width={size} height={size} alt={alt ?? title ?? ""} draggable={false} {...img} />;
 }

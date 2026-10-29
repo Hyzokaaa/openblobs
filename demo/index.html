@@ -57,6 +57,8 @@
 
   fieldset { border:0; padding:0; margin:0 0 14px; min-width:0; }
   legend { padding:0; font-size:13px; font-weight:600; margin-bottom:6px; }
+  fieldset:disabled { opacity:.5; }
+  fieldset:disabled .seg span, fieldset:disabled .seg input { cursor:not-allowed; }
   .seg { display:inline-flex; flex-wrap:wrap; gap:2px; padding:3px; border:1px solid var(--border); border-radius:10px; background:var(--card); }
   .seg label { position:relative; }
   .seg input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
@@ -161,10 +163,14 @@
       </div>
 
       <fieldset>
+        <legend>Design</legend>
+        <div class="seg" id="designSeg"></div>
+      </fieldset>
+      <fieldset>
         <legend>Background</legend>
         <div class="seg" id="bgSeg"></div>
       </fieldset>
-      <fieldset>
+      <fieldset id="moodField">
         <legend>Mood</legend>
         <div class="seg" id="moodSeg"></div>
       </fieldset>
@@ -203,6 +209,27 @@
     <div class="card" id="comments"></div>
   </section>
 
+  <section class="block" aria-labelledby="h-design">
+    <h2 id="h-design">Bring your own design</h2>
+    <p class="sub">Draw the parts, keep the guarantees: same seed, same avatar, contrast-checked colours. The monsters are 15 SVG snippets and one call.</p>
+    <div class="code">
+      <pre><code id="designSnippet">import { layeredDesign, openblob } from "openblobs";
+
+const monsters = layeredDesign({
+  name: "monsters",
+  layers: [
+    ["", hornsSvg, earsSvg],           // "" = sometimes none
+    [roundSvg, squareSvg, ghostSvg],   // fill="{body}"
+    [twoEyesSvg, oneEyeSvg, sleepySvg],
+    [smileSvg, fangsSvg, ohSvg],
+  ],
+});
+
+openblob(user.id, { design: monsters });</code></pre>
+      <button class="btn" id="copyDesignBtn" type="button">Copy</button>
+    </div>
+  </section>
+
   <section class="block" aria-labelledby="h-use">
     <h2 id="h-use">Use it</h2>
     <p class="sub">Plain SVG strings, a data URI helper and a React component.</p>
@@ -228,12 +255,16 @@ import { Openblob } from "openblobs/react";
 </footer>
 
 <script type="module">
-import { openblob } from "../dist/index.js";
+import { blobs, layeredDesign, openblob } from "../dist/index.js";
+import { monsters } from "./monsters.js";
 
 const $ = id => document.getElementById(id);
 const pick = list => list[Math.floor(Math.random() * list.length)];
-const avatar = (seed, { size, bg, mood }) => openblob(seed, { size, background: bg, mood: mood === "auto" ? undefined : mood });
+const DESIGNS = { blobs, monsters: layeredDesign(monsters) };
+const avatar = (seed, { size, bg, mood, design }) =>
+  openblob(seed, { size, background: bg, mood: mood === "auto" ? undefined : mood, design: DESIGNS[design] });
 
+const DESIGN_CHOICES = [["blobs", "Blobs"], ["monsters", "Monsters"]];
 const BACKGROUNDS = [["circle", "Circle"], ["squircle", "Squircle"], ["none", "None"]];
 const MOODS = [["auto", "From seed"], ["calm", "Calm"], ["happy", "Happy"], ["sleepy", "Sleepy"], ["surprised", "Surprised"], ["busy", "Busy"]];
 const NAMES = ["Sam Porter", "Carla Méndez", "Leo Martín", "Clara Pérez", "Ana López", "admin@example.net", "hello@example.com", "María José", "John Smith", "01JD8X2K4P", "Priya Natarajan", "Øyvind Hansen", "李伟", "Fatima Zahra", "Tom O'Brien", "Lucía Fernández", "Kenji Watanabe", "Olga Ivanova", "Pedro Sánchez", "Emma Wilson", "noreply@example.org", "Sven Berg", "Aisha Bello", "Diego Ramírez", "Chloé Martin", "Yusuf Kaya", "Nadia Petrov", "Raúl Costa", "Grace Hill", "Ada Lane", "Linus K.", "Marta Gil", "Hugo Duarte", "Iris Novak", "Pablo Ruiz", "Sara Cohen", "Ivan Horvat", "Elena Rossi", "Mateo Vargas", "Zoe Clarke"];
@@ -263,7 +294,7 @@ function segmented(container, name, options, value) {
     `<label><input type="radio" name="${name}" value="${v}"${v === value ? " checked" : ""}><span>${label}</span></label>`).join("");
 }
 const choice = name => document.querySelector(`input[name="${name}"]:checked`).value;
-const opts = () => ({ bg: choice("bg"), mood: choice("mood") });
+const opts = () => ({ design: choice("design"), bg: choice("bg"), mood: choice("mood") });
 
 function renderPreview() {
   const seed = $("seed").value, o = opts();
@@ -275,6 +306,10 @@ function renderPreview() {
 
 function renderAll() {
   const o = opts();
+  // Moods belong to the blobs: other designs have no say in them
+  const faces = o.design === "blobs";
+  $("moodField").disabled = !faces;
+  $("h-moods").closest("section").hidden = !faces;
   const own = (n, px) => avatar(n, { ...o, size: px });
   const initials = (n, px) => `<div class="initials" aria-hidden="true" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.38)}px">${n.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase()}</div>`;
   const member = (av, [name, role, status]) => `<div class="row">${av(name, 32)}<span class="who"><b>${name}</b><br><span class="muted">${role}</span></span><span class="muted">${status}</span></div>`;
@@ -330,25 +365,29 @@ $("grid").addEventListener("click", e => {
 });
 $("brand").addEventListener("click", e => { e.preventDefault(); window.scrollTo(0, 0); });
 
-$("copyBtn").addEventListener("click", async () => {
-  const text = $("snippet").textContent;
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    const range = document.createRange();
-    range.selectNodeContents($("snippet"));
-    getSelection().removeAllRanges();
-    getSelection().addRange(range);
-    document.execCommand("copy");
-  }
-  $("copyBtn").textContent = "Copied";
-  announce("Code copied to clipboard");
-  setTimeout(() => { $("copyBtn").textContent = "Copy"; }, 1600);
-});
+function copier(button, source) {
+  button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(source.textContent);
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      getSelection().removeAllRanges();
+      getSelection().addRange(range);
+      document.execCommand("copy");
+    }
+    button.textContent = "Copied";
+    announce("Code copied to clipboard");
+    setTimeout(() => { button.textContent = "Copy"; }, 1600);
+  });
+}
+copier($("copyBtn"), $("snippet"));
+copier($("copyDesignBtn"), $("designSnippet"));
 
+segmented($("designSeg"), "design", DESIGN_CHOICES, "blobs");
 segmented($("bgSeg"), "bg", BACKGROUNDS, "circle");
 segmented($("moodSeg"), "mood", MOODS, "auto");
-["bgSeg", "moodSeg"].forEach(id => $(id).addEventListener("change", renderAll));
+["designSeg", "bgSeg", "moodSeg"].forEach(id => $(id).addEventListener("change", renderAll));
 applyTheme(readTheme());
 renderAll();
 </script>
