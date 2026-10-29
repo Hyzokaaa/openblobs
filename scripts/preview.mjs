@@ -83,17 +83,39 @@ function inContext() {
   return image(w, h, body);
 }
 
-// One seed, five moods, and the same person in another design
-function moodsAndDesigns() {
-  const w = 1100, h = 300, t = LIGHT, seed = "sam@example.com";
+// One person as every design, and an empty slot for the one you draw
+function designsRow() {
+  const seed = "sam@example.com", t = LIGHT, size = 120, step = 170, x0 = 60, y = 140;
+  const one = (design) => { const noun = design.name.replace(/s$/, ""); return `${/^[aeiou]/.test(noun) ? "an" : "a"} ${noun}`; };
+  const slots = DESIGNS.length + 1, w = x0 * 2 + (slots - 1) * step + size, h = 344;
   let body = `<rect width="${w}" height="${h}" rx="24" fill="${t.bg}"/>`
-    + text(60, 66, 28, t.text, "One seed, five moods", `font-weight="800"`)
-    + text(878, 66, 28, t.text, "…or a monster", `font-weight="800" text-anchor="middle"`);
-  ["calm", "happy", "sleepy", "surprised", "busy"].forEach((mood, i) => {
-    body += avatar(seed, 120, 60 + i * 140, 96, { mood }) + text(120 + i * 140, 250, 18, t.muted, mood, `text-anchor="middle"`);
+    + text(x0, 66, 28, t.text, `Be ${DESIGNS.map(one).join(", ")}…`, `font-weight="800"`)
+    + text(x0, 100, 18, t.muted, "…or whatever your inspiration draws. Same seed, same person, any design.");
+  DESIGNS.forEach((design, i) => {
+    body += avatar(seed, size, x0 + i * step, y, { design })
+      + text(x0 + i * step + size / 2, y + size + 34, 18, t.muted, one(design), `text-anchor="middle"`);
   });
-  body += `<line x1="770" y1="100" x2="770" y2="250" stroke="${t.border}" stroke-width="2"/>`
-    + avatar(seed, 140, 808, 90, { design: monsters }) + text(878, 270, 18, t.muted, "monsters", `text-anchor="middle"`);
+  const cx = x0 + DESIGNS.length * step + size / 2, cy = y + size / 2;
+  body += `<circle cx="${cx}" cy="${cy}" r="${size / 2 - 2}" fill="${t.card}" stroke="${t.primary}" stroke-width="2.5" stroke-dasharray="8 7"/>`
+    + `<path d="M${cx - 14} ${cy}h28M${cx} ${cy - 14}v28" stroke="${t.primary}" stroke-width="4" stroke-linecap="round"/>`
+    + text(cx, y + size + 34, 18, t.primary, "yours", `text-anchor="middle" font-weight="700"`);
+  return image(w, h, body);
+}
+
+// Five moods: big in the default design, small in each of the others below
+function moods() {
+  const seed = "sam@example.com", t = LIGHT, size = 112, mini = 40, step = 176, x0 = 60, y = 128;
+  const list = ["calm", "happy", "sleepy", "surprised", "busy"], others = DESIGNS.slice(1);
+  const w = x0 * 2 + (list.length - 1) * step + size, h = y + size + 30 + mini + 64;
+  let body = `<rect width="${w}" height="${h}" rx="24" fill="${t.bg}"/>`
+    + text(x0, 66, 28, t.text, "Five moods, in every design", `font-weight="800"`)
+    + `<text x="${x0}" y="100" font-size="18" fill="${t.muted}" ${FONT}>Only the face changes: <tspan ${MONO}>openblob(seed, { mood })</tspan>.</text>`;
+  list.forEach((mood, i) => {
+    const x = x0 + i * step, row = others.length * mini + (others.length - 1) * 4;
+    body += avatar(seed, size, x, y, { mood })
+      + others.map((design, j) => avatar(seed, mini, x + (size - row) / 2 + j * (mini + 4), y + size + 14, { design, mood })).join("")
+      + text(x + size / 2, y + size + 14 + mini + 30, 18, t.muted, mood, `text-anchor="middle"`);
+  });
   return image(w, h, body);
 }
 
@@ -102,4 +124,5 @@ save("banner-light", banner(LIGHT));
 save("banner-dark", banner(DARK));
 save("how-it-works", howItWorks());
 save("in-context", inContext());
-save("moods-and-designs", moodsAndDesigns());
+save("designs", designsRow());
+save("moods", moods());

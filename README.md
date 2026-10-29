@@ -63,7 +63,7 @@ Seeds are normalised (Unicode NFC, trimmed, lower-cased) before hashing. An empt
 
 ## Designs
 
-![One seed drawn with five moods, calm, happy, sleepy, surprised and busy, and the same seed as a monster.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/moods-and-designs.svg)
+![One person as a blob, a monster, a robot and a critter, and an empty slot marked "yours" for your own design.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/designs.svg)
 
 `blobs` is the default. More designs ship with the package, each in its own module so you only bundle what you use:
 
@@ -81,6 +81,8 @@ openblob(user.id, { design: monsters });
 | `critters` | Cats, bears and bunnies with button noses. |
 
 All of them draw the five moods, and a person keeps their features in every mood: only the expression changes.
+
+![One seed in five moods, calm, happy, sleepy, surprised and busy: big as a blob, and small as a monster, a robot and a critter below each.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/moods.svg)
 
 Want to add one? See [Contributing](CONTRIBUTING.md#adding-a-design): a design is one file of SVG parts, and the tests check the rest.
 
