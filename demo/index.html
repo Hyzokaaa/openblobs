@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>openblobs</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#6b7280; --border:#e5e7eb; --primary:#4f46e5; }
+  :root[data-theme="dark"] { --bg:#0f1219; --card:#171b24; --text:#e6e8ee; --muted:#9aa1ad; --border:#262c38; --primary:#818cf8; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, sans-serif; }
+  main { max-width:1100px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  h2 { font-size:15px; margin:0 0 12px; }
+  p.lead { color:var(--muted); margin:0 0 20px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
+  .bar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  input[type=text] { flex:1; min-width:200px; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:15px; }
+  select, button { padding:7px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); cursor:pointer; }
+  .big { display:flex; gap:24px; align-items:flex-end; flex-wrap:wrap; margin-top:16px; }
+  .big figure { margin:0; text-align:center; color:var(--muted); font-size:12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:12px; }
+  .cell { text-align:center; font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cell svg { display:block; margin:0 auto 6px; }
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:700px) { .compare { grid-template-columns:1fr; } }
+  .row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
+  .row:last-child { border-bottom:0; }
+  .row .ref { color:var(--muted); font-variant-numeric:tabular-nums; width:72px; }
+  .row .subj { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .stack { display:flex; }
+  .stack > * { margin-left:-6px; border-radius:50%; box-shadow:0 0 0 2px var(--card); }
+  .stack > *:first-child { margin-left:0; }
+  .initials { border-radius:50%; background:color-mix(in srgb, var(--primary) 10%, transparent); border:1px solid color-mix(in srgb, var(--primary) 20%, transparent); color:var(--primary); font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .timeline { display:flex; gap:10px; padding:10px 0; }
+  .bubble { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:8px 12px; flex:1; }
+  .bubble b { display:block; font-size:13px; }
+  .muted { color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>openblobs</h1>
+  <p class="lead">Same seed, same avatar. Drawn in your browser, no dependencies. Type a name, an email or an id.</p>
+
+  <section class="card">
+    <div class="bar">
+      <input id="seed" type="text" value="sam@example.com" aria-label="Seed">
+      <select id="bgSel" aria-label="Background"><option value="circle">Circle</option><option value="squircle">Squircle</option><option value="none">No background</option></select>
+      <select id="moodSel" aria-label="Mood"><option value="auto">Mood from seed</option><option value="calm">Calm</option><option value="happy">Happy</option><option value="sleepy">Sleepy</option><option value="surprised">Surprised</option><option value="busy">Busy</option></select>
+      <button id="themeBtn">Dark mode</button>
+    </div>
+    <div class="big" id="big"></div>
+  </section>
+
+  <section class="card">
+    <h2>40 seeds</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="compare">
+    <div class="card">
+      <h2>Ticket list — initials</h2>
+      <div id="listOld"></div>
+    </div>
+    <div class="card">
+      <h2>Ticket list — openblobs</h2>
+      <div id="listNew"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>A ticket conversation</h2>
+    <div id="timeline"></div>
+  </section>
+</main>
+<script type="module">
+import { openblob } from "../dist/index.js";
+const avatar = (s, { size, bg, mood }) => openblob(s, { size, background: bg, mood: mood === "auto" ? undefined : mood });
+const $ = id => document.getElementById(id);
+const NAMES = ["Sam Porter", "Carla Méndez", "Leo Martín", "Clara Pérez", "Ana López", "admin@local.test", "support@example.com", "María José", "John Smith", "01JD8X2K4P", "Priya Natarajan", "Øyvind Hansen", "李伟", "Fatima Zahra", "Tom O'Brien", "Lucía Fernández", "Kenji Watanabe", "Olga Ivanova", "Pedro Sánchez", "Emma Wilson", "noreply@example.org", "Sven Berg", "Aisha Bello", "Diego Ramírez", "Chloé Martin", "Yusuf Kaya", "Nadia Petrov", "Raúl Costa", "Grace Hill", "Ada Lane", "Linus K.", "Marta Gil", "Hugo Duarte", "Iris Novak", "Pablo Ruiz", "Sara Cohen", "Ivan Horvat", "Elena Rossi", "Mateo Vargas", "Zoe Clarke"];
+const initials = (n, px) => `<div class="initials" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.38)}px">${n.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase()}</div>`;
+const TICKETS = [["OH-1042", "Emails are not reaching the support mailbox", "Sam Porter", ["Leo Martín", "Clara Pérez"]],
+  ["OH-1041", "Error 500 when exporting the workspace", "Carla Méndez", ["Leo Martín"]],
+  ["OH-1039", "Can we change the reference prefix?", "Ana López", ["Clara Pérez", "Carla Méndez", "Leo Martín"]],
+  ["OH-1037", "The customer VPN drops every night", "John Smith", ["Carla Méndez"]],
+  ["OH-1036", "Add a new agent", "María José", []]];
+
+function opts() { return { bg: $("bgSel").value, mood: $("moodSel").value }; }
+function render() {
+  const s = $("seed").value, o = opts();
+  $("big").innerHTML = [20, 24, 32, 48, 96, 160].map(px => `<figure>${avatar(s, { ...o, size: px })}<figcaption>${px}px</figcaption></figure>`).join("");
+  $("grid").innerHTML = NAMES.map(n => `<div class="cell" title="${n}">${avatar(n, { ...o, size: 64 })}${n}</div>`).join("");
+  const row = (av, t) => `<div class="row"><span class="ref">${t[0]}</span>${av(t[2], 24)}<span class="subj">${t[1]}</span><span class="stack">${t[3].map(a => av(a, 20)).join("")}</span></div>`;
+  $("listOld").innerHTML = TICKETS.map(t => row(initials, t)).join("");
+  $("listNew").innerHTML = TICKETS.map(t => row((n, px) => avatar(n, { ...o, size: px }), t)).join("");
+  const msgs = [["Sam Porter", "customer · 2 h ago", "Since yesterday nothing arrives at support@."], ["Leo Martín", "agent · 1 h ago", "On it. Did anything change on the IMAP server?"], ["Sam Porter", "customer · 40 min ago", "Carla rotated the account password, could be that."]];
+  $("timeline").innerHTML = msgs.map(m => `<div class="timeline">${avatar(m[0], { ...o, size: 32 })}<div class="bubble"><b>${m[0]}</b><span class="muted">${m[1]}</span><div>${m[2]}</div></div></div>`).join("");
+}
+["seed", "bgSel", "moodSel"].forEach(id => $(id).addEventListener("input", render));
+$("themeBtn").addEventListener("click", () => {
+  const dark = document.documentElement.dataset.theme === "dark";
+  document.documentElement.dataset.theme = dark ? "light" : "dark";
+  $("themeBtn").textContent = dark ? "Dark mode" : "Light mode";
+});
+render();
+</script>
+</body>
+</html>
