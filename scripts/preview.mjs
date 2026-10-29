@@ -2,10 +2,9 @@
 // avatars in an interface, and moods and designs. Run with `npm run preview`.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { blobs, openblob } from "../dist/index.js";
-import * as bundled from "../dist/designs/index.js";
+import { designs, monsters } from "../dist/designs/index.js";
 
-const { monsters } = bundled;
-const DESIGNS = [blobs, ...Object.values(bundled)];
+const DESIGNS = [blobs, ...designs];
 
 const FONT = `font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"`;
 const MONO = `font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"`;

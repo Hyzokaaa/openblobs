@@ -2,12 +2,13 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from "vitest";
 import { blobs, openblob, type Design } from "../src/index.js";
-import * as bundled from "../src/designs/index.js";
+import * as registry from "../src/designs/index.js";
 
 const files = Object.keys(import.meta.glob("../src/designs/*.ts"))
   .map((path) => path.replace(/^.*\/|\.ts$/g, ""))
   .filter((file) => file !== "index");
-const designs: [string, Design][] = [["blobs", blobs], ...Object.entries(bundled)];
+const { designs: ordered, ...bundled } = registry;
+const designs: [string, Design][] = [["blobs", blobs], ...ordered.map((design): [string, Design] => [design.name, design])];
 const seeds = Array.from({ length: 300 }, (_, i) => `person-${i}@example.test`);
 
 // Inline SVG shares the page: ids, styles and references would leak into it or clash between avatars
@@ -25,9 +26,10 @@ function balanced(svg: string): boolean {
 }
 
 describe("src/designs", () => {
-  it("lists every design file in its index, under the file's name", () => {
+  it("exports every design file under the file's name, and lists each one once in order", () => {
     expect(Object.keys(bundled).sort()).toEqual([...files].sort());
     for (const [key, design] of Object.entries(bundled)) expect(design.name).toBe(key);
+    expect([...ordered].sort((a, b) => a.name.localeCompare(b.name))).toEqual(Object.values(bundled));
   });
 });
 

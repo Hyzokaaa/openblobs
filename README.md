@@ -76,9 +76,9 @@ openblob(user.id, { design: monsters });
 | Design     | Looks like |
 |------------|------------|
 | `blobs`    | Blobs, pebbles, beans and drops. The default. |
-| `critters` | Cats, bears and bunnies with button noses. |
 | `monsters` | Horned, one-eyed or furry monsters. |
 | `robots`   | Robots with a screen for a face, antennas and bolts. |
+| `critters` | Cats, bears and bunnies with button noses. |
 
 All of them draw the five moods, and a person keeps their features in every mood: only the expression changes.
 

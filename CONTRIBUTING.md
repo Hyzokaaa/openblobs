@@ -53,7 +53,7 @@ A design is one file in [`src/designs`](src/designs). The quickest kind is a lay
 
    [`monsters.ts`](src/designs/monsters.ts) is a complete example. If parts are not enough, `defineDesign` lets you draw in code; [`blobs.ts`](src/blobs.ts) is written that way.
    **Give it moods.** Eyes and mouths can come per mood: `{ calm: [...], happy: [...], sleepy: [...], surprised: [...], busy: [...] }`, with the same number of parts in the same order for every mood, so each person keeps their features and only the expression changes. The tests check that every mood draws something different. All the bundled designs do this; [`robots.ts`](src/designs/robots.ts) and [`critters.ts`](src/designs/critters.ts) are short examples.
-5. **Add it to [`src/designs/index.ts`](src/designs/index.ts)** and to the table of designs in the README, both in alphabetical order.
+5. **Add it to [`src/designs/index.ts`](src/designs/index.ts):** export it in alphabetical order, and add it at the end of the `designs` list, which sets the order of the demo and the docs. Add it at the end of the table of designs in the README too.
 6. **Run `npm test`.** Every design is checked for you: same seed, same avatar; enough variety; well-formed SVG; no ids, styles, gradients, filters, scripts or links that would leak into the page; no leftover placeholders. The first run writes a snapshot of your design: commit it.
 7. **Look at it:** `npm run build`, `npx serve .` and open `/demo/?design=<name>`. Try the dark mode and the small sizes (20 and 24 px): details that vanish there are better left out.
 8. **Open a pull request** with a screenshot of the demo grid.

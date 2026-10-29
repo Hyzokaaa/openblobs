@@ -344,12 +344,12 @@
 
 <script type="module">
 import { blobs, layeredDesign, openblob, openblobUri } from "../dist/index.js";
-import * as bundled from "../dist/designs/index.js";
+import { designs } from "../dist/designs/index.js";
 
 const $ = id => document.getElementById(id);
 const pick = list => list[Math.floor(Math.random() * list.length)];
-// Every design in src/designs shows up here on its own
-const DESIGNS = { blobs, ...bundled };
+// Every design in src/designs shows up here on its own, in the order of the registry
+const DESIGNS = Object.fromEntries([blobs, ...designs].map(design => [design.name, design]));
 const avatar = (seed, { size, bg, mood, design }) =>
   openblob(seed, { size, background: bg, mood: mood === "auto" ? undefined : mood, design: DESIGNS[design] });
 
