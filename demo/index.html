@@ -135,12 +135,35 @@
   .play-actions input:focus-visible { outline-offset:0; border-color:var(--focus); }
   .play-preview > .muted { margin:0; }
 
-  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:8px; list-style:none; padding:0; margin:0; }
-  .cell { display:flex; flex-direction:column; align-items:center; gap:6px; width:100%; padding:12px 6px 10px; border:1px solid transparent; border-radius:12px; background:transparent; color:var(--muted); font:inherit; font-size:12px; cursor:pointer; }
-  .cell:hover { background:var(--card); border-color:var(--border); color:var(--text); }
-  .cell[aria-current="true"] { background:var(--primary-soft); border-color:var(--primary); color:var(--text); }
-  .cell svg { display:block; }
-  .cell .name { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* Avatar wall: three rows drifting in turns, paused while you look */
+  .wall-block { padding:8px 0 24px; border-top:1px solid var(--border); }
+  .wall { display:grid; gap:10px; padding:20px 0; overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image:linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+  .wall-row { position:relative; display:flex; width:max-content; }
+  .wall-row:hover, .wall-row:focus-within { z-index:1; }
+  .wall-row:nth-child(2) { margin-left:-50px; }
+  .wall-group { display:flex; gap:12px; padding-right:12px; }
+  .cell { position:relative; display:block; padding:6px; border:0; border-radius:50%; background:transparent; cursor:pointer; font:inherit; }
+  .cell svg { display:block; width:76px; height:76px; transition:transform .2s; }
+  .cell:hover svg, .cell:focus-visible svg { transform:scale(1.1); }
+  .cell[aria-current="true"] svg { outline:3px solid var(--primary); outline-offset:3px; border-radius:50%; }
+  .cell .name { position:absolute; left:50%; bottom:-4px; z-index:1; transform:translate(-50%, 4px); padding:2px 10px; border-radius:999px; background:var(--text); color:var(--bg); font-size:12px; font-weight:600; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .15s, transform .15s; }
+  .cell:hover .name, .cell:focus-visible .name { opacity:1; transform:translate(-50%, 0); }
+  @media (prefers-reduced-motion: no-preference) {
+    .wall-row { animation:drift 70s linear infinite; }
+    .wall-row:nth-child(2) { animation-direction:reverse; animation-duration:80s; }
+    .wall-row:nth-child(3) { animation-duration:90s; }
+    .wall:hover .wall-row, .wall:focus-within .wall-row { animation-play-state:paused; }
+  }
+  @keyframes drift { to { transform:translateX(-50%); } }
+  /* Without motion, the rows stand still and wrap: no copy is needed */
+  @media (prefers-reduced-motion: reduce) {
+    .wall { -webkit-mask-image:none; mask-image:none; }
+    .wall-row { width:auto; }
+    .wall-group { flex-wrap:wrap; justify-content:center; }
+    .wall-group[aria-hidden] { display:none; }
+  }
 
   .moods { display:flex; flex-wrap:wrap; gap:24px; }
   .moods figure { margin:0; text-align:center; color:var(--muted); font-size:13px; }
@@ -175,6 +198,7 @@
     .compare { grid-template-columns:1fr; }
     .play { grid-template-columns:1fr; }
     .play textarea { height:280px; }
+    .cell svg { width:60px; height:60px; }
     .links .label { display:none; }
   }
   @media (max-width:400px) {
@@ -184,7 +208,7 @@
   }
   @media (prefers-reduced-motion: no-preference) {
     html { scroll-behavior:smooth; }
-    .cell, .seg span, .btn { transition:background-color .15s, border-color .15s, color .15s; }
+    .seg span, .btn { transition:background-color .15s, border-color .15s, color .15s; }
   }
 </style>
 </head>
@@ -263,10 +287,9 @@
     <div class="designs" id="designs"></div>
   </section>
 
-  <section class="block" aria-labelledby="h-grid">
-    <h2 id="h-grid">40 seeds</h2>
-    <p class="sub">Every string gets its own avatar. Pick one to try it above.</p>
-    <ul class="grid" id="grid"></ul>
+  <section class="wall-block" aria-labelledby="h-grid">
+    <h2 id="h-grid" class="sr-only">Try a seed</h2>
+    <div class="wall" id="grid"></div>
   </section>
 
   <section class="block" aria-labelledby="h-moods">
@@ -386,7 +409,10 @@ function renderAll() {
   const member = (av, [name, role, status]) => `<div class="row">${av(name, 32)}<span class="who"><b>${name}</b><br><span class="muted">${role}</span></span><span class="muted">${status}</span></div>`;
 
   $("logo").innerHTML = openblob("openblobs", { size: 28, background: "squircle", mood: "happy" });
-  $("grid").innerHTML = NAMES.map((n, i) => `<li><button class="cell" type="button" data-index="${i}" aria-label="Load ${n}">${own(n, 56)}<span class="name" aria-hidden="true">${n}</span></button></li>`).join("");
+  // Three rows, each drawn twice so the drift loops without a seam; the copy is hidden from assistive tech
+  const rows = [NAMES.slice(0, 14), NAMES.slice(14, 27), NAMES.slice(27)];
+  const cells = (row, copy) => row.map(n => `<button class="cell" type="button" data-index="${NAMES.indexOf(n)}"${copy ? ' tabindex="-1"' : ""} aria-label="Load ${n}">${own(n, 76)}<span class="name" aria-hidden="true">${n}</span></button>`).join("");
+  $("grid").innerHTML = rows.map(row => `<div class="wall-row"><div class="wall-group">${cells(row, false)}</div><div class="wall-group" aria-hidden="true">${cells(row, true)}</div></div>`).join("");
   document.querySelectorAll(".cell").forEach(c => { c.dataset.seed = NAMES[c.dataset.index]; });
   $("teamOld").innerHTML = TEAM.map(m => member(initials, m)).join("");
   $("teamNew").innerHTML = TEAM.map(m => member(own, m)).join("");
