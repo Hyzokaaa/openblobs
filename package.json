@@ -3,6 +3,15 @@
   "version": "0.1.0",
   "description": "Deterministic, friendly SVG avatars from any string. Zero dependencies.",
   "license": "MIT",
+  "author": "Luis Miguel Lagos Xenes",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hyzokaaa/openblobs.git"
+  },
+  "homepage": "https://github.com/Hyzokaaa/openblobs#readme",
+  "bugs": {
+    "url": "https://github.com/Hyzokaaa/openblobs/issues"
+  },
   "type": "module",
   "sideEffects": false,
   "files": [
@@ -23,7 +32,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "peerDependencies": {
     "react": ">=18"
