@@ -2,7 +2,10 @@
 
 **[Live demo](https://hyzokaaa.github.io/openblobs/)**
 
-![A row of blobs and a row of monsters, a custom design](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/preview.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/banner-dark.svg">
+  <img alt="openblobs: friendly avatars from any string. A grid of blobs and monsters." src="https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/banner-light.svg">
+</picture>
 
 Friendly, deterministic SVG avatars from any string. The same seed always draws the same little creature, and you can bring your own design and keep every guarantee.
 
@@ -10,6 +13,8 @@ Friendly, deterministic SVG avatars from any string. The same seed always draws 
 - Nothing leaves your app: avatars are drawn locally, no third-party requests.
 - Ink always reaches a 4.5:1 contrast against the body, in the built-in blobs and in your own designs.
 - No element ids, gradients or filters, so any number of avatars can share a page.
+
+![A seed such as sam@example.com always becomes the same blob, and the same monster in the monsters design.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/how-it-works.svg)
 
 ## Install
 
@@ -42,6 +47,8 @@ Anything else (Vue, Svelte, a template, an email) can use the data URI:
 
 Seed with a stable id rather than a name or an email: the avatar survives renames and reveals nothing about the person.
 
+![A comment thread with blobs and a team list with monsters, at 40 px.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/in-context.svg)
+
 ## Options
 
 | Option       | Default     | Meaning |
@@ -55,6 +62,8 @@ Seed with a stable id rather than a name or an email: the avatar survives rename
 Seeds are normalised (Unicode NFC, trimmed, lower-cased) before hashing. An empty or blank seed draws the avatar of `"?"`.
 
 ## Designs
+
+![One seed drawn with five moods, calm, happy, sleepy, surprised and busy, and the same seed as a monster.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/moods-and-designs.svg)
 
 `blobs` is the default. More designs ship with the package, each in its own module so you only bundle what you use:
 
@@ -136,7 +145,7 @@ npm run build
 npx serve .
 ```
 
-Then open `/demo/`. `npm run preview` redraws the image at the top of this file.
+Then open `/demo/`. `npm run preview` redraws the images of this file, in `media/`.
 
 ## License
 
