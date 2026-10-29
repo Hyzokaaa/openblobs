@@ -6,6 +6,9 @@
 
 - Custom designs: `layeredDesign` builds one from SVG parts with colour placeholders, `defineDesign` draws one in code. Both get a seeded generator and the contrast-checked palette. Pass it as the `design` option or prop.
 - `blobs`, the built-in design, written with the same API.
+- `monsters`, a second design, from `openblobs/designs/monsters`. Every bundled design has its own module and is listed in `openblobs/designs`.
+- `CONTRIBUTING.md`, issue and pull request templates, and tests that check every design in `src/designs` on their own: determinism, variety, well-formed SVG with nothing that leaks into the page, and a snapshot.
+- The demo lists every bundled design and opens on one with `?design=<name>`.
 - `default` export conditions, for tools that do not ask for `import`.
 
 ### Changed

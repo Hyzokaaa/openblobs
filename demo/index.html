@@ -255,16 +255,17 @@ import { Openblob } from "openblobs/react";
 </footer>
 
 <script type="module">
-import { blobs, layeredDesign, openblob } from "../dist/index.js";
-import { monsters } from "./monsters.js";
+import { blobs, openblob } from "../dist/index.js";
+import * as bundled from "../dist/designs/index.js";
 
 const $ = id => document.getElementById(id);
 const pick = list => list[Math.floor(Math.random() * list.length)];
-const DESIGNS = { blobs, monsters: layeredDesign(monsters) };
+// Every design in src/designs shows up here on its own
+const DESIGNS = { blobs, ...bundled };
 const avatar = (seed, { size, bg, mood, design }) =>
   openblob(seed, { size, background: bg, mood: mood === "auto" ? undefined : mood, design: DESIGNS[design] });
 
-const DESIGN_CHOICES = [["blobs", "Blobs"], ["monsters", "Monsters"]];
+const DESIGN_CHOICES = Object.keys(DESIGNS).map(name => [name, name[0].toUpperCase() + name.slice(1).replace(/-/g, " ")]);
 const BACKGROUNDS = [["circle", "Circle"], ["squircle", "Squircle"], ["none", "None"]];
 const MOODS = [["auto", "From seed"], ["calm", "Calm"], ["happy", "Happy"], ["sleepy", "Sleepy"], ["surprised", "Surprised"], ["busy", "Busy"]];
 const NAMES = ["Sam Porter", "Carla Méndez", "Leo Martín", "Clara Pérez", "Ana López", "admin@example.net", "hello@example.com", "María José", "John Smith", "01JD8X2K4P", "Priya Natarajan", "Øyvind Hansen", "李伟", "Fatima Zahra", "Tom O'Brien", "Lucía Fernández", "Kenji Watanabe", "Olga Ivanova", "Pedro Sánchez", "Emma Wilson", "noreply@example.org", "Sven Berg", "Aisha Bello", "Diego Ramírez", "Chloé Martin", "Yusuf Kaya", "Nadia Petrov", "Raúl Costa", "Grace Hill", "Ada Lane", "Linus K.", "Marta Gil", "Hugo Duarte", "Iris Novak", "Pablo Ruiz", "Sara Cohen", "Ivan Horvat", "Elena Rossi", "Mateo Vargas", "Zoe Clarke"];
@@ -384,7 +385,9 @@ function copier(button, source) {
 copier($("copyBtn"), $("snippet"));
 copier($("copyDesignBtn"), $("designSnippet"));
 
-segmented($("designSeg"), "design", DESIGN_CHOICES, "blobs");
+// ?design=monsters opens the demo on that design, handy to link from a pull request
+const wanted = new URLSearchParams(location.search).get("design");
+segmented($("designSeg"), "design", DESIGN_CHOICES, Object.hasOwn(DESIGNS, wanted ?? "") ? wanted : "blobs");
 segmented($("bgSeg"), "bg", BACKGROUNDS, "circle");
 segmented($("moodSeg"), "mood", MOODS, "auto");
 ["designSeg", "bgSeg", "moodSeg"].forEach(id => $(id).addEventListener("change", renderAll));

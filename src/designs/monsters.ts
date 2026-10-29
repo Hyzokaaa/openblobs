@@ -1,8 +1,10 @@
-// An example of a layered design: plain SVG parts in a 100 × 100 box, coloured with placeholders.
-// Use it with `layeredDesign(monsters)`. Append parts or layers at the end: reordering redraws everyone.
-const pupils = (y, r) => `<circle cx="41.5" cy="${y}" r="${r}" fill="{ink}"/><circle cx="61.5" cy="${y}" r="${r}" fill="{ink}"/>`;
+import { layeredDesign } from "../design.js";
 
-export const monsters = {
+// Horned, one-eyed or sleepy monsters, made of plain SVG parts in a 100 × 100 box.
+// Append parts or layers at the end: reordering them redraws everyone.
+const pupils = (y: number, r: number) => `<circle cx="41.5" cy="${y}" r="${r}" fill="{ink}"/><circle cx="61.5" cy="${y}" r="${r}" fill="{ink}"/>`;
+
+export const monsters = layeredDesign({
   name: "monsters",
   layers: [
     // Horns and ears, drawn first so the body hides their base
@@ -36,4 +38,4 @@ export const monsters = {
       `<ellipse cx="33" cy="60" rx="5" ry="3" fill="{blush}" opacity=".6"/><ellipse cx="67" cy="60" rx="5" ry="3" fill="{blush}" opacity=".6"/>`,
     ],
   ],
-};
+});

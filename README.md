@@ -54,6 +54,23 @@ Seed with a stable id rather than a name or an email: the avatar survives rename
 
 Seeds are normalised (Unicode NFC, trimmed, lower-cased) before hashing. An empty or blank seed draws the avatar of `"?"`.
 
+## Designs
+
+`blobs` is the default. More designs ship with the package, each in its own module so you only bundle what you use:
+
+```ts
+import { monsters } from "openblobs/designs/monsters";
+
+openblob(user.id, { design: monsters });
+```
+
+| Design     | Looks like |
+|------------|------------|
+| `blobs`    | Blobs, pebbles, beans and drops, with moods. The default. |
+| `monsters` | Horned, one-eyed or sleepy monsters. |
+
+Want to add one? See [Contributing](CONTRIBUTING.md#adding-a-design): a design is one file of SVG parts, and the tests check the rest.
+
 ## Your own design
 
 ### From parts
@@ -77,7 +94,7 @@ const monsters = layeredDesign({
 openblob(user.id, { design: monsters });
 ```
 
-Placeholders: `{body}`, `{ink}`, `{shade}`, `{gear}` (readable on light and dark pages), `{accent}`, `{blush}` and `{background}`. Pass `hues: [200, 220, 240]` to stay within your brand. The full monsters of the demo are in [`demo/monsters.js`](demo/monsters.js).
+Placeholders: `{body}`, `{ink}`, `{shade}`, `{gear}` (readable on light and dark pages), `{accent}`, `{blush}` and `{background}`. Pass `hues: [200, 220, 240]` to stay within your brand. The full monsters are in [`src/designs/monsters.ts`](src/designs/monsters.ts).
 
 ### In code
 
@@ -123,4 +140,4 @@ Then open `/demo/`. `npm run preview` redraws the image at the top of this file.
 
 ## License
 
-MIT
+MIT. Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).

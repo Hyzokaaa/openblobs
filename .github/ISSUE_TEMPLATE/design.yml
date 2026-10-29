@@ -1,0 +1,34 @@
+name: Propose a design
+description: A new set of avatars to ship with openblobs
+labels: ["design"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks! A sketch is plenty at this stage. The steps to build it are in [CONTRIBUTING.md](https://github.com/Hyzokaaa/openblobs/blob/main/CONTRIBUTING.md#adding-a-design).
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: Lower-case, one or two words.
+      placeholder: robots
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What do the avatars look like, and which parts change from seed to seed?
+    validations:
+      required: true
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Sketch or mock-up
+      description: Drop an image here. Rough is fine.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Before you start
+      options:
+        - label: The art is my own work and I am happy to release it under the MIT licence.
+          required: true

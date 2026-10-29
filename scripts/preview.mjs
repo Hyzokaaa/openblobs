@@ -1,10 +1,10 @@
-// Draws media/preview.svg, the image at the top of the README: a row of blobs and a row of the example monsters.
+// Draws media/preview.svg, the image at the top of the README: a row of blobs and a row per bundled design.
 import { writeFileSync } from "node:fs";
-import { layeredDesign, openblob } from "../dist/index.js";
-import { monsters } from "../demo/monsters.js";
+import { openblob } from "../dist/index.js";
+import * as bundled from "../dist/designs/index.js";
 
 const SEEDS = ["Sam Porter", "Carla Méndez", "Leo Martín", "Ana López", "01JD8X2K4P", "Priya Natarajan", "Øyvind Hansen", "hello@example.com"];
-const CELL = 88, GAP = 12, ROWS = [{}, { design: layeredDesign(monsters) }];
+const CELL = 88, GAP = 12, ROWS = [{}, ...Object.values(bundled).map((design) => ({ design }))];
 const width = SEEDS.length * CELL + (SEEDS.length - 1) * GAP, height = ROWS.length * CELL + (ROWS.length - 1) * GAP;
 
 const cells = ROWS.flatMap((options, row) => SEEDS.map((seed, col) =>

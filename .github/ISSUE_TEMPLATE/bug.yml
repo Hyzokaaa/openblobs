@@ -1,0 +1,16 @@
+name: Report a bug
+description: Something draws wrong, breaks or does not install
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you expected, what you got, and the seed and options if an avatar looks wrong.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: openblobs 0.2.0, Node 22, Safari 18

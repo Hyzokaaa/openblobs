@@ -25,6 +25,16 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./designs": {
+      "types": "./dist/designs/index.d.ts",
+      "import": "./dist/designs/index.js",
+      "default": "./dist/designs/index.js"
+    },
+    "./designs/*": {
+      "types": "./dist/designs/*.d.ts",
+      "import": "./dist/designs/*.js",
+      "default": "./dist/designs/*.js"
+    },
     "./react": {
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js",
