@@ -5,6 +5,7 @@ import { drawTraits } from "./traits.js";
 /** The default design: a blob, a pebble, a bean or a drop, sometimes with an antenna, a sprout or a headset. */
 export const blobs = defineDesign({
   name: "blobs",
+  description: "Blobs, pebbles, beans and drops, with five moods.",
   draw(context) {
     const t = drawTraits(context);
     const cx = 50, cy = t.top === "none" ? 52 : 56;

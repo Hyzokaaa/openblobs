@@ -6,6 +6,7 @@ const pupils = (y: number, r: number) => `<circle cx="41.5" cy="${y}" r="${r}" f
 
 export const monsters = layeredDesign({
   name: "monsters",
+  description: "Horned, one-eyed or sleepy monsters.",
   layers: [
     // Horns and ears, drawn first so the body hides their base
     [

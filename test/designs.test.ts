@@ -34,7 +34,8 @@ describe("src/designs", () => {
 describe.each(designs)("%s", (name, design) => {
   const drawings = seeds.map((seed) => openblob(seed, { design }));
 
-  it("has a short, lower-case name", () => {
+  it("has a short, lower-case name and a one-line description", () => {
+    expect(design.description).toMatch(/^[^\n]{10,100}$/);
     expect(name).toMatch(/^[a-z][a-z0-9-]{1,30}$/);
   });
 

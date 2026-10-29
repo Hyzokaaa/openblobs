@@ -9,19 +9,19 @@
 <style>
   :root {
     --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#596170; --border:#e3e6eb;
-    --primary:#4f46e5; --primary-soft:#eef0fe; --on-primary:#fff; --focus:#4f46e5;
+    --primary:#4f46e5; --primary-soft:#eef0fe; --on-primary:#fff; --focus:#4f46e5; --warn:#b45309;
     color-scheme:light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg:#0f1219; --card:#171b24; --text:#e6e8ee; --muted:#a0a7b3; --border:#283040;
-      --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc;
+      --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc; --warn:#fbbf24;
       color-scheme:dark;
     }
   }
   :root[data-theme="dark"] {
     --bg:#0f1219; --card:#171b24; --text:#e6e8ee; --muted:#a0a7b3; --border:#283040;
-    --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc;
+    --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc; --warn:#fbbf24;
     color-scheme:dark;
   }
 
@@ -80,6 +80,38 @@
   .sub { color:var(--muted); margin:0 0 20px; }
   .sub code { font-size:13px; background:var(--card); border:1px solid var(--border); padding:1px 6px; border-radius:6px; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; }
+  .hl { color:var(--primary); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:0; margin:-8px 0 26px; }
+  .chips li { padding:4px 12px; border:1px solid var(--border); border-radius:999px; background:var(--card); color:var(--muted); font-size:13px; }
+  .btn.primary { background:var(--primary); border-color:var(--primary); color:var(--on-primary); font-weight:600; }
+  .btn.primary:hover { border-color:var(--primary); filter:brightness(1.08); }
+
+  /* Designs */
+  .designs { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap:16px; }
+  .design-card { display:flex; flex-direction:column; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; }
+  .design-card[aria-current="true"] { border-color:var(--primary); box-shadow:inset 0 0 0 1px var(--primary); }
+  .design-card header { display:flex; align-items:center; gap:8px; }
+  .design-card h3 { font-size:16px; color:var(--text); margin:0; }
+  .design-card p { margin:0; color:var(--muted); }
+  .badge { font-size:12px; padding:1px 8px; border-radius:999px; background:var(--primary-soft); color:var(--primary); }
+  .faces { display:flex; flex-wrap:wrap; gap:6px; }
+  .faces img { display:block; }
+  .design-card code { font-size:12.5px; color:var(--muted); overflow-wrap:anywhere; }
+  .design-card .btn { align-self:flex-start; height:36px; font-size:14px; }
+
+  /* Playground */
+  .play { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:20px; align-items:start; }
+  .play textarea { display:block; width:100%; height:360px; resize:vertical; padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--card); color:var(--text); font:12.5px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space:pre; overflow:auto; tab-size:2; }
+  .play textarea:focus-visible { outline-offset:0; border-color:var(--focus); }
+  .play .muted code { font-size:12px; background:var(--card); border:1px solid var(--border); padding:0 4px; border-radius:4px; }
+  .play-preview { display:flex; flex-direction:column; gap:12px; }
+  .play-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; padding:16px; background:var(--card); border:1px solid var(--border); border-radius:16px; }
+  .play-grid img { display:block; width:100%; height:auto; aspect-ratio:1; }
+  .play-error { margin:0; min-height:1.5em; color:var(--warn); font-size:13px; }
+  .play-actions { display:flex; gap:8px; }
+  .play-actions input { flex:1; min-width:0; height:44px; padding:0 12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--text); font:14px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .play-actions input:focus-visible { outline-offset:0; border-color:var(--focus); }
+  .play-preview > .muted { margin:0; }
 
   .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:8px; list-style:none; padding:0; margin:0; }
   .cell { display:flex; flex-direction:column; align-items:center; gap:6px; width:100%; padding:12px 6px 10px; border:1px solid transparent; border-radius:12px; background:transparent; color:var(--muted); font:inherit; font-size:12px; cursor:pointer; }
@@ -119,6 +151,8 @@
     .stage-main { width:200px; height:200px; }
     .stage-main svg { width:128px; height:128px; }
     .compare { grid-template-columns:1fr; }
+    .play { grid-template-columns:1fr; }
+    .play textarea { height:280px; }
     .links .label { display:none; }
   }
   @media (max-width:400px) {
@@ -150,8 +184,11 @@
 <main class="wrap">
   <section class="hero" id="hero" aria-labelledby="title">
     <div>
-      <h1 id="title">Friendly avatars from any string.</h1>
-      <p class="lead">Same seed, same avatar. Deterministic SVG, drawn in the browser or on the server, with no dependencies. Type a name, an email or an id.</p>
+      <h1 id="title">Friendly avatars from <span class="hl">any string</span>.</h1>
+      <p class="lead">Same seed, same avatar. Deterministic SVG, drawn in the browser or on the server. Pick a design or bring your own. Type a name, an email or an id.</p>
+      <ul class="chips" aria-label="Highlights">
+        <li>Zero dependencies</li><li>WCAG contrast</li><li>SVG · React</li><li>Your own designs</li>
+      </ul>
 
       <label class="field-label" for="seed">Seed</label>
       <div class="seed-row">
@@ -182,9 +219,15 @@
     </div>
   </section>
 
+  <section class="block" aria-labelledby="h-designs">
+    <h2 id="h-designs">Designs</h2>
+    <p class="sub">Each one in its own module, so you only ship what you use. Same seed, same person, in any of them.</p>
+    <div class="designs" id="designs"></div>
+  </section>
+
   <section class="block" aria-labelledby="h-grid">
     <h2 id="h-grid">40 seeds</h2>
-    <p class="sub">Every string gets its own blob. Pick one to try it above.</p>
+    <p class="sub">Every string gets its own avatar. Pick one to try it above.</p>
     <ul class="grid" id="grid"></ul>
   </section>
 
@@ -210,24 +253,26 @@
   </section>
 
   <section class="block" aria-labelledby="h-design">
-    <h2 id="h-design">Bring your own design</h2>
-    <p class="sub">Draw the parts, keep the guarantees: same seed, same avatar, contrast-checked colours. The monsters are 15 SVG snippets and one call.</p>
-    <div class="code">
-      <pre><code id="designSnippet">import { layeredDesign, openblob } from "openblobs";
-
-const monsters = layeredDesign({
-  name: "monsters",
-  layers: [
-    ["", hornsSvg, earsSvg],           // "" = sometimes none
-    [roundSvg, squareSvg, ghostSvg],   // fill="{body}"
-    [twoEyesSvg, oneEyeSvg, sleepySvg],
-    [smileSvg, fangsSvg, ohSvg],
-  ],
-});
-
-openblob(user.id, { design: monsters });</code></pre>
-      <button class="btn" id="copyDesignBtn" type="button">Copy</button>
+    <h2 id="h-design">Make your own</h2>
+    <p class="sub">Draw the parts, keep the guarantees: same seed, same avatar, contrast-checked colours. Edit the parts below and watch the avatars change.</p>
+    <div class="play">
+      <div class="play-editor">
+        <label class="field-label" for="parts">Parts, in a 100 × 100 box</label>
+        <textarea id="parts" spellcheck="false" autocomplete="off" aria-describedby="partsHelp"></textarea>
+        <p class="muted" id="partsHelp">One part per line, <code>---</code> between layers, <code>(none)</code> for a part that draws nothing, <code>#</code> for notes. Colours: <code>{body}</code> <code>{ink}</code> <code>{shade}</code> <code>{gear}</code> <code>{accent}</code> <code>{blush}</code>.</p>
+      </div>
+      <div class="play-preview">
+        <div class="play-grid" id="playGrid" aria-live="off"></div>
+        <p class="play-error" id="playError" role="status"></p>
+        <div class="play-actions">
+          <label class="sr-only" for="designName">Design name</label>
+          <input id="designName" type="text" value="robots" autocomplete="off" spellcheck="false" aria-describedby="nameHelp">
+          <button class="btn primary" id="copyDesignBtn" type="button">Copy as a design file</button>
+        </div>
+        <p class="muted" id="nameHelp">Lower-case name. The file goes in <code>src/designs/</code>: <a href="https://github.com/Hyzokaaa/openblobs/blob/main/CONTRIBUTING.md#adding-a-design">contributing guide</a>.</p>
+      </div>
     </div>
+    <pre hidden><code id="designSnippet"></code></pre>
   </section>
 
   <section class="block" aria-labelledby="h-use">
@@ -249,13 +294,13 @@ import { Openblob } from "openblobs/react";
 
 <footer>
   <div class="wrap">
-    <span>openblobs · MIT licence</span>
+    <span>openblobs · MIT licence · <a href="https://github.com/Hyzokaaa/openblobs/blob/main/CONTRIBUTING.md">Contribute a design</a></span>
     <span>No tracking, no fonts, no dependencies.</span>
   </div>
 </footer>
 
 <script type="module">
-import { blobs, openblob } from "../dist/index.js";
+import { blobs, layeredDesign, openblob, openblobUri } from "../dist/index.js";
 import * as bundled from "../dist/designs/index.js";
 
 const $ = id => document.getElementById(id);
@@ -321,7 +366,96 @@ function renderAll() {
   $("teamOld").innerHTML = TEAM.map(m => member(initials, m)).join("");
   $("teamNew").innerHTML = TEAM.map(m => member(own, m)).join("");
   $("comments").innerHTML = COMMENTS.map(([name, when, text]) => `<div class="comment">${own(name, 32)}<div class="bubble"><b>${name}</b><span class="muted">${when}</span><div>${text}</div></div></div>`).join("");
+  renderDesigns(o);
+  renderPlay();
   renderPreview();
+}
+
+const camel = name => name.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
+const escapeHtml = s => s.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
+
+function renderDesigns(o) {
+  $("designs").innerHTML = Object.entries(DESIGNS).map(([name, design]) => {
+    const faces = NAMES.slice(0, 6).map(n => `<img src="${openblobUri(n, { design, background: o.bg })}" width="40" height="40" alt="">`).join("");
+    const use = name === "blobs" ? `import { openblob } from "openblobs"` : `import { ${camel(name)} } from "openblobs/designs/${name}"`;
+    return `<article class="design-card" aria-current="${name === o.design}">
+      <header><h3>${name}</h3>${name === "blobs" ? '<span class="badge">default</span>' : ""}</header>
+      <p>${escapeHtml(design.description ?? "")}</p>
+      <div class="faces">${faces}</div>
+      <code>${use}</code>
+      <button class="btn" type="button" data-design="${name}" aria-label="Try ${name}">Try it</button>
+    </article>`;
+  }).join("");
+}
+
+$("designs").addEventListener("click", e => {
+  const button = e.target.closest("[data-design]");
+  if (!button) return;
+  document.querySelector(`input[name="design"][value="${button.dataset.design}"]`).checked = true;
+  renderAll();
+  $("hero").scrollIntoView({ block: "start" });
+  announce(`Showing ${button.dataset.design}`);
+});
+
+// Playground: parts in plain text, drawn with layeredDesign as you type
+const STARTER = `# Bodies: one part per line, in a 100 × 100 box
+<circle cx="50" cy="54" r="30" fill="{body}"/>
+<rect x="22" y="26" width="56" height="56" rx="18" fill="{body}"/>
+---
+# Eyes
+<circle cx="40" cy="50" r="4.5" fill="{ink}"/><circle cx="60" cy="50" r="4.5" fill="{ink}"/>
+<path d="M35 50h10M55 50h10" stroke="{ink}" stroke-width="3.4" stroke-linecap="round"/>
+---
+# Mouths: (none) draws nothing for some seeds
+<path d="M43 63q7 6 14 0" stroke="{ink}" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+(none)
+---
+# Hats
+(none)
+<path d="M50 25v-9" stroke="{gear}" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="13" r="4.5" fill="{accent}"/>
+`;
+// Same rule as the tests: inline SVG must not leak into the page
+const LEAKS = /\bid=|<style|<script|<foreignObject|<image|<use\b|<filter|<mask|<clipPath|Gradient|\bhref=|url\(|\bon\w+=/i;
+const COLOURS = ["body", "ink", "shade", "gear", "accent", "background", "blush"];
+
+function parseParts(text) {
+  return text.split(/^\s*---\s*$/m)
+    .map(block => block.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"))
+      .map(line => (line === "(none)" ? "" : line)))
+    .filter(layer => layer.length);
+}
+
+function designFile(name, layers) {
+  const literal = s => "`" + s.replace(/[`\\$]/g, "\\$&") + "`";
+  return `import { layeredDesign } from "../design.js";
+
+export const ${camel(name)} = layeredDesign({
+  name: "${name}",
+  description: "One line on what it draws.",
+  layers: [
+${layers.map(layer => `    [${layer.map(literal).join(", ")}],`).join("\n")}
+  ],
+});
+`;
+}
+
+function renderPlay() {
+  const layers = parseParts($("parts").value), name = $("designName").value.trim(), parts = layers.flat();
+  const unknown = [...parts.join("").matchAll(/\{(\w+)\}/g)].map(m => m[1]).find(key => !COLOURS.includes(key));
+  const error = !layers.length ? "Add at least one part."
+    : parts.some(part => LEAKS.test(part)) ? "Ids, styles, gradients, filters, scripts and links leak into the page: the tests turn them away."
+    : unknown ? `{${unknown}} is not a colour. Use ${COLOURS.map(c => `{${c}}`).join(" ")}.`
+    : !/^[a-z][a-z0-9-]{1,30}$/.test(name) ? "The name takes lower-case letters, digits and dashes."
+    : "";
+  if (layers.length) {
+    const design = layeredDesign({ name: "playground", layers });
+    // As <img>, so whatever is typed here never runs on the page
+    $("playGrid").innerHTML = NAMES.slice(0, 12).map(n => `<img src="${openblobUri(n, { design, background: choice("bg") })}" alt="">`).join("");
+  }
+  $("playError").textContent = error;
+  $("designSnippet").textContent = designFile(name || "mine", layers);
+  $("copyDesignBtn").disabled = Boolean(error);
+  try { localStorage.setItem("openblobs-parts", $("parts").value); } catch {}
 }
 
 function setSeed(seed) {
@@ -391,6 +525,11 @@ segmented($("designSeg"), "design", DESIGN_CHOICES, Object.hasOwn(DESIGNS, wante
 segmented($("bgSeg"), "bg", BACKGROUNDS, "circle");
 segmented($("moodSeg"), "mood", MOODS, "auto");
 ["designSeg", "bgSeg", "moodSeg"].forEach(id => $(id).addEventListener("change", renderAll));
+let draft = null;
+try { draft = localStorage.getItem("openblobs-parts"); } catch {}
+$("parts").value = draft || STARTER;
+$("parts").addEventListener("input", renderPlay);
+$("designName").addEventListener("input", renderPlay);
 applyTheme(readTheme());
 renderAll();
 </script>

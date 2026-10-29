@@ -8,7 +8,8 @@
 - `blobs`, the built-in design, written with the same API.
 - `monsters`, a second design, from `openblobs/designs/monsters`. Every bundled design has its own module and is listed in `openblobs/designs`.
 - `CONTRIBUTING.md`, issue and pull request templates, and tests that check every design in `src/designs` on their own: determinism, variety, well-formed SVG with nothing that leaks into the page, and a snapshot.
-- The demo lists every bundled design and opens on one with `?design=<name>`.
+- The demo has a card per design and a playground: type SVG parts, see them on twelve seeds, and copy a design file that passes the tests. It opens on a design with `?design=<name>`.
+- Designs can carry a one-line `description`.
 - `default` export conditions, for tools that do not ask for `import`.
 
 ### Changed

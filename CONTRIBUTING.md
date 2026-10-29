@@ -17,6 +17,8 @@ npm test
 
 A design is one file in [`src/designs`](src/designs). The quickest kind is a layered one: SVG parts, and the seed picks one per layer.
 
+**The fastest start:** the [demo](https://hyzokaaa.github.io/openblobs/#h-design) has a playground. Paste your parts, watch them on twelve seeds, and "Copy as a design file" gives you the file for step 4, ready to commit.
+
 1. **Draw the parts** in any tool on a 100 × 100 canvas: bodies, eyes, mouths, hats, whatever your creatures are made of. Keep everything inside the canvas, and leave room for the round backdrop.
 2. **Export each part as SVG** and keep only the elements (`<path>`, `<circle>`, `<rect>`, `<ellipse>`, `<g>`...), without the `<svg>` wrapper.
 3. **Replace the colours with placeholders** so every avatar gets its own contrast-checked palette:
@@ -39,6 +41,7 @@ A design is one file in [`src/designs`](src/designs). The quickest kind is a lay
 
    export const robots = layeredDesign({
      name: "robots",
+     description: "Boxy robots with antennas and screens for faces.",
      layers: [
        // Bottom to top. "" makes a layer optional; repeat a part to make it more common.
        [`<rect x="22" y="26" width="56" height="54" rx="10" fill="{body}"/>`, `...`],

@@ -39,6 +39,8 @@ export interface Drawing {
 
 export interface Design {
   name: string;
+  /** One line on what it draws, shown in the demo. */
+  description?: string;
   draw(context: DesignContext): Drawing;
 }
 
@@ -61,6 +63,8 @@ export function context(seed: string, options: OpenblobOptions = {}): DesignCont
 
 export interface LayeredDesignOptions {
   name: string;
+  /** One line on what it draws, shown in the demo. */
+  description?: string;
   /**
    * Drawn bottom to top. Each layer is a list of SVG snippets in a 100 × 100 viewBox and the seed picks one;
    * an empty string makes the layer optional. Colours can be `{body}`, `{ink}`, `{shade}`, `{gear}`,
@@ -72,13 +76,14 @@ export interface LayeredDesignOptions {
 }
 
 /** A design made of interchangeable parts, for art drawn in a design tool rather than in code. */
-export function layeredDesign({ name, layers, hues }: LayeredDesignOptions): Design {
+export function layeredDesign({ name, description, layers, hues }: LayeredDesignOptions): Design {
   layers.forEach((parts, i) => {
     if (!parts.length) throw new Error(`openblobs: layer ${i} of "${name}" has no parts`);
   });
   if (hues && !hues.length) throw new Error(`openblobs: "${name}" has an empty list of hues`);
   return defineDesign({
     name,
+    description,
     draw({ pick, palette }) {
       const colors = palette({ hue: hues ? pick(hues) : undefined });
       const svg = layers
