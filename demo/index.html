@@ -9,19 +9,19 @@
 <style>
   :root {
     --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#596170; --border:#e3e6eb;
-    --primary:#4f46e5; --primary-soft:#eef0fe; --on-primary:#fff; --focus:#4f46e5; --warn:#b45309;
+    --primary:#4f46e5; --primary-soft:#eef0fe; --on-primary:#fff; --focus:#4f46e5; --warn:#b45309; --str:#047857; --tag:#be185d;
     color-scheme:light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg:#0f1219; --card:#171b24; --text:#e6e8ee; --muted:#a0a7b3; --border:#283040;
-      --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc; --warn:#fbbf24;
+      --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc; --warn:#fbbf24; --str:#6ee7b7; --tag:#f9a8d4;
       color-scheme:dark;
     }
   }
   :root[data-theme="dark"] {
     --bg:#0f1219; --card:#171b24; --text:#e6e8ee; --muted:#a0a7b3; --border:#283040;
-    --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc; --warn:#fbbf24;
+    --primary:#818cf8; --primary-soft:#1f2440; --on-primary:#0f1219; --focus:#a5b4fc; --warn:#fbbf24; --str:#6ee7b7; --tag:#f9a8d4;
     color-scheme:dark;
   }
 
@@ -44,7 +44,7 @@
   .icon-btn { border:1px solid var(--border); background:transparent; cursor:pointer; font:inherit; font-size:14px; }
 
   /* Hero */
-  .hero { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:48px; align-items:center; padding:56px 0 40px; }
+  .hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:56px; align-items:start; padding:56px 0 48px; }
   h1 { font-size:clamp(28px, 5vw, 40px); line-height:1.15; letter-spacing:-0.02em; margin:0 0 12px; }
   .lead { color:var(--muted); font-size:17px; margin:0 0 28px; max-width:46ch; }
   .field-label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
@@ -67,12 +67,34 @@
   .seg input:checked + span { background:var(--primary); color:var(--on-primary); }
   .seg input:focus-visible + span { outline:2px solid var(--focus); outline-offset:1px; }
 
-  .stage { display:flex; flex-direction:column; align-items:center; gap:20px; }
-  .stage-main { display:grid; place-items:center; width:240px; height:240px; border-radius:28px; background:var(--card); border:1px solid var(--border); }
-  .stage-main svg { display:block; width:160px; height:160px; }
+  .stage { display:flex; flex-wrap:wrap; align-items:flex-end; gap:24px; margin-top:8px; }
+  .stage-main { display:grid; place-items:center; width:208px; height:208px; border-radius:28px; background:var(--card); border:1px solid var(--border); }
+  .stage-main svg { display:block; width:144px; height:144px; }
   .sizes { display:flex; align-items:flex-end; gap:14px; }
   .sizes figure { margin:0; text-align:center; color:var(--muted); font-size:12px; }
   .sizes svg { display:block; margin:0 auto 4px; }
+
+  /* Add it to your app */
+  .hero-side { display:flex; flex-direction:column; gap:14px; min-width:0; padding:20px; background:var(--card); border:1px solid var(--border); border-radius:20px; }
+  .hero-side fieldset { margin:0; }
+  .hero-side .seg { background:var(--bg); align-self:flex-start; max-width:100%; }
+  .hero-main { min-width:0; }
+  .cmd { display:flex; align-items:center; gap:8px; padding:6px 6px 6px 14px; background:var(--bg); border:1px solid var(--border); border-radius:12px; }
+  .cmd code { flex:1; min-width:0; overflow-x:auto; white-space:nowrap; font-size:14px; }
+  .cmd .prompt { color:var(--muted); }
+  .cmd .btn { height:34px; font-size:13px; }
+  .side-label { margin:6px 0 -4px; padding-top:14px; border-top:1px solid var(--border); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  .code-head { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; padding-top:4px; }
+  .file { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; color:var(--muted); }
+  .snippet { margin:0; overflow:auto; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px; min-height:184px; font-size:13px; line-height:1.6; }
+  .code-tools { display:flex; align-items:center; gap:10px; }
+  .code-tools .btn { height:34px; font-size:13px; }
+  .note { margin:0; font-size:13px; }
+  .note code { font-size:12px; }
+  .tok-k { color:var(--primary); }
+  .tok-s { color:var(--str); }
+  .tok-t { color:var(--tag); }
+  .tok-c { color:var(--muted); font-style:italic; }
 
   /* Sections */
   section.block { padding:32px 0; border-top:1px solid var(--border); }
@@ -138,18 +160,18 @@
   .bubble b { margin-right:8px; }
   .muted { color:var(--muted); font-size:13px; }
 
-  .code { position:relative; }
-  .code pre { margin:0; overflow:auto; background:var(--card); border:1px solid var(--border); padding:16px; padding-right:96px; border-radius:12px; font-size:13px; line-height:1.6; }
-  .code .btn { position:absolute; top:8px; right:8px; height:34px; font-size:13px; }
 
   footer { border-top:1px solid var(--border); padding:24px 0 40px; color:var(--muted); font-size:13px; }
   footer .wrap { display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:space-between; }
 
+  @media (max-width:900px) {
+    .hero { grid-template-columns:minmax(0,1fr); }
+  }
   @media (max-width:760px) {
-    .hero { grid-template-columns:1fr; gap:32px; padding:32px 0 28px; }
-    .stage { order:-1; }
-    .stage-main { width:200px; height:200px; }
-    .stage-main svg { width:128px; height:128px; }
+    .hero { gap:32px; padding:32px 0 28px; }
+    .hero-side { padding:16px; }
+    .stage-main { width:176px; height:176px; }
+    .stage-main svg { width:120px; height:120px; }
     .compare { grid-template-columns:1fr; }
     .play { grid-template-columns:1fr; }
     .play textarea { height:280px; }
@@ -183,14 +205,14 @@
 
 <main class="wrap">
   <section class="hero" id="hero" aria-labelledby="title">
-    <div>
+    <div class="hero-main">
       <h1 id="title">Friendly avatars from <span class="hl">any string</span>.</h1>
-      <p class="lead">Same seed, same avatar. Deterministic SVG, drawn in the browser or on the server. Pick a design or bring your own. Type a name, an email or an id.</p>
+      <p class="lead">Same seed, same avatar. Deterministic SVG, drawn in the browser or on the server. Pick a design or bring your own.</p>
       <ul class="chips" aria-label="Highlights">
         <li>Zero dependencies</li><li>WCAG contrast</li><li>SVG · React</li><li>Your own designs</li>
       </ul>
 
-      <label class="field-label" for="seed">Seed</label>
+      <label class="field-label" for="seed">Find your avatar: type a name, an email or an id</label>
       <div class="seed-row">
         <input id="seed" type="text" value="sam@example.com" autocomplete="off" spellcheck="false">
         <button class="btn" id="randomBtn" type="button" aria-label="Random seed">
@@ -199,6 +221,20 @@
         </button>
       </div>
 
+      <div class="stage">
+        <div class="stage-main" id="big"></div>
+        <div class="sizes" id="sizes"></div>
+      </div>
+    </div>
+
+    <div class="hero-side" aria-label="Add it to your app">
+      <div class="seg" id="pmSeg" aria-label="Package manager" role="radiogroup"></div>
+      <div class="cmd">
+        <code><span class="prompt" aria-hidden="true">$ </span><span id="installCmd"></span></code>
+        <button class="btn" id="copyInstall" type="button">Copy</button>
+      </div>
+
+      <p class="side-label">Your config</p>
       <fieldset>
         <legend>Design</legend>
         <div class="seg" id="designSeg"></div>
@@ -211,11 +247,13 @@
         <legend>Mood</legend>
         <div class="seg" id="moodSeg"></div>
       </fieldset>
-    </div>
 
-    <div class="stage">
-      <div class="stage-main" id="big"></div>
-      <div class="sizes" id="sizes"></div>
+      <div class="code-head">
+        <div class="seg" id="fwSeg" aria-label="Framework" role="radiogroup"></div>
+        <span class="code-tools"><span class="file" id="fileName"></span><button class="btn" id="copyBtn" type="button">Copy</button></span>
+      </div>
+      <pre class="snippet"><code id="snippet"></code></pre>
+      <p class="muted note">Use a stable id, such as <code>user.id</code>, as the seed: the avatar survives renames and reveals nothing about the person.</p>
     </div>
   </section>
 
@@ -275,21 +313,7 @@
     <pre hidden><code id="designSnippet"></code></pre>
   </section>
 
-  <section class="block" aria-labelledby="h-use">
-    <h2 id="h-use">Use it</h2>
-    <p class="sub">Plain SVG strings, a data URI helper and a React component.</p>
-    <div class="code">
-      <pre><code id="snippet">npm install openblobs
-
-import { openblob, openblobUri } from "openblobs";
-const svg = openblob(user.id, { size: 32 });
-
-import { Openblob } from "openblobs/react";
-&lt;Openblob seed={user.id} size={32} title={user.name} /&gt;</code></pre>
-      <button class="btn" id="copyBtn" type="button">Copy</button>
-    </div>
-    <p class="sr-only" id="status" role="status" aria-live="polite"></p>
-  </section>
+  <p class="sr-only" id="status" role="status" aria-live="polite"></p>
 </main>
 
 <footer>
@@ -348,6 +372,7 @@ function renderPreview() {
   $("sizes").innerHTML = [20, 24, 32, 48, 64].map(px => `<figure>${avatar(seed, { ...o, size: px })}<figcaption>${px}</figcaption></figure>`).join("");
   $("moods").innerHTML = MOODS.slice(1).map(([m, label]) => `<figure>${avatar(seed, { ...o, mood: m, size: 72 })}<figcaption>${label}</figcaption></figure>`).join("");
   document.querySelectorAll(".cell").forEach(c => c.setAttribute("aria-current", c.dataset.seed === seed ? "true" : "false"));
+  renderCode();
 }
 
 function renderAll() {
@@ -372,6 +397,59 @@ function renderAll() {
 }
 
 const camel = name => name.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
+
+// Add it to your app: the install command and the code for the current config
+const MANAGERS = [["npm", "npm install"], ["pnpm", "pnpm add"], ["yarn", "yarn add"], ["bun", "bun add"]];
+const FRAMEWORKS = [["react", "React", "Avatar.tsx"], ["js", "JavaScript", "avatar.js"], ["uri", "Any framework", "avatar.js"]];
+
+function snippetFor(framework, { design, bg, mood }, seed) {
+  const lines = [], quoted = JSON.stringify(seed || "?"), id = camel(design);
+  const options = [];
+  if (design !== "blobs") options.push(["design", id]);
+  if (bg !== "circle") options.push(["background", JSON.stringify(bg)]);
+  if (mood !== "auto" && design === "blobs") options.push(["mood", JSON.stringify(mood)]);
+  const designImport = design === "blobs" ? [] : [`import { ${id} } from "openblobs/designs/${design}";`];
+
+  if (framework === "react") {
+    const attr = ([key, value]) => (value.startsWith('"') ? `${key}=${value}` : `${key}={${value}}`);
+    lines.push(`import { Openblob } from "openblobs/react";`, ...designImport, "", "<Openblob",
+      `  seed=${/["\\{}]/.test(seed) ? `{${quoted}}` : quoted}`, "  size={48}", ...options.map(o => `  ${attr(o)}`), "/>");
+  } else if (framework === "js") {
+    lines.push(`import { openblob } from "openblobs";`, ...designImport, "",
+      `const svg = openblob(${quoted}, {`, "  size: 48,", ...options.map(([k, v]) => `  ${k}: ${v},`), "});");
+  } else {
+    const object = options.length ? `, { ${options.map(([k, v]) => `${k}: ${v}`).join(", ")} }` : "";
+    lines.push(`import { openblobUri } from "openblobs";`, ...designImport, "",
+      "// A data URI: works in any <img>, in Vue, Svelte, emails…", `img.src = openblobUri(${quoted}${object});`);
+  }
+  return lines.join("\n");
+}
+
+const highlight = code => code.replace(
+  /(\/\/.*$)|("(?:[^"\\]|\\.)*")|\b(import|from|const)\b|(<\/?[A-Z]\w*|\/>)|([&<>])/gm,
+  (match, comment, string, keyword, tag, char) => {
+    const safe = match.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+    if (comment) return `<span class="tok-c">${safe}</span>`;
+    if (string) return `<span class="tok-s">${safe}</span>`;
+    if (keyword) return `<span class="tok-k">${safe}</span>`;
+    if (tag) return `<span class="tok-t">${safe}</span>`;
+    return safe;
+  });
+
+function remember(key, value) { try { localStorage.setItem(key, value); } catch {} }
+function recall(key, fallback, allowed) {
+  try { const v = localStorage.getItem(key); if (allowed.includes(v)) return v; } catch {}
+  return fallback;
+}
+
+function renderCode() {
+  const pm = choice("pm"), fw = choice("fw");
+  $("installCmd").textContent = `${MANAGERS.find(([id]) => id === pm)[1]} openblobs`;
+  $("fileName").textContent = FRAMEWORKS.find(([id]) => id === fw)[2];
+  $("snippet").innerHTML = highlight(snippetFor(fw, opts(), $("seed").value.trim()));
+  remember("openblobs-pm", pm);
+  remember("openblobs-fw", fw);
+}
 const escapeHtml = s => s.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
 
 function renderDesigns(o) {
@@ -517,12 +595,16 @@ function copier(button, source) {
   });
 }
 copier($("copyBtn"), $("snippet"));
+copier($("copyInstall"), $("installCmd"));
 copier($("copyDesignBtn"), $("designSnippet"));
 
 // ?design=monsters opens the demo on that design, handy to link from a pull request
 const wanted = new URLSearchParams(location.search).get("design");
 segmented($("designSeg"), "design", DESIGN_CHOICES, Object.hasOwn(DESIGNS, wanted ?? "") ? wanted : "blobs");
 segmented($("bgSeg"), "bg", BACKGROUNDS, "circle");
+segmented($("pmSeg"), "pm", MANAGERS.map(([id]) => [id, id]), recall("openblobs-pm", "npm", MANAGERS.map(([id]) => id)));
+segmented($("fwSeg"), "fw", FRAMEWORKS.map(([id, label]) => [id, label]), recall("openblobs-fw", "react", FRAMEWORKS.map(([id]) => id)));
+["pmSeg", "fwSeg"].forEach(id => $(id).addEventListener("change", renderCode));
 segmented($("moodSeg"), "mood", MOODS, "auto");
 ["designSeg", "bgSeg", "moodSeg"].forEach(id => $(id).addEventListener("change", renderAll));
 let draft = null;
