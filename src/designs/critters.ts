@@ -15,7 +15,7 @@ export const critters = layeredDesign({
   layers: [
     // Ears, drawn first so the head hides their base
     [
-      `<path d="M23 46 26 15l22 15zM77 46l-3-31-22 15z" fill="{body}"/><path d="M29 36.5l1.6-14.5 11 8.4zM71 36.5 69.4 22l-11 8.4z" fill="{blush}"/>`,
+      `<path d="M29.5 44 26 13l18.5 21.5zM70.5 44 74 13 55.5 34.5z" fill="{body}"/><path d="M31.5 38.5 29 20.5l11.5 12zM68.5 38.5 71 20.5l-11.5 12z" fill="{blush}"/>`,
       `<circle cx="28" cy="32" r="11" fill="{body}"/><circle cx="72" cy="32" r="11" fill="{body}"/><circle cx="28" cy="32" r="5.6" fill="{shade}"/><circle cx="72" cy="32" r="5.6" fill="{shade}"/>`,
       `<ellipse cx="38" cy="23" rx="7.5" ry="16" fill="{body}"/><ellipse cx="62" cy="23" rx="7.5" ry="16" fill="{body}"/><ellipse cx="38" cy="24" rx="3.4" ry="10.5" fill="{blush}"/><ellipse cx="62" cy="24" rx="3.4" ry="10.5" fill="{blush}"/>`,
     ],
@@ -29,7 +29,7 @@ export const critters = layeredDesign({
       "",
       `<ellipse cx="50" cy="67" rx="12.5" ry="8.5" fill="#fff" opacity=".5"/>`,
       `<ellipse cx="50" cy="67" rx="12.5" ry="8.5" fill="#fff" opacity=".5"/>`,
-      `<ellipse cx="61" cy="53" rx="9.5" ry="8.5" fill="{shade}"/>`,
+      `<path d="M44 37.5v4.5M50 35.5v6M56 37.5v4.5" stroke="{shade}" stroke-width="3" stroke-linecap="round"/>`,
     ],
     // Eyes: dots or shiny, in every mood
     {
