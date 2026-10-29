@@ -2,7 +2,10 @@
 // avatars in an interface, and moods and designs. Run with `npm run preview`.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { blobs, openblob } from "../dist/index.js";
-import { monsters } from "../dist/designs/index.js";
+import * as bundled from "../dist/designs/index.js";
+
+const { monsters } = bundled;
+const DESIGNS = [blobs, ...Object.values(bundled)];
 
 const FONT = `font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"`;
 const MONO = `font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"`;
@@ -23,7 +26,7 @@ function banner(t) {
   const chip = (x, label) => `<g transform="translate(${x} 468)"><rect width="${label.length * 11 + 32}" height="44" rx="22" fill="${t.card}" stroke="${t.border}"/>${text(16, 29, 19, t.muted, label)}</g>`;
   let grid = "";
   for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
-    grid += avatar(NAMES[r * 4 + c], size, x0 + c * (size + gap), y0 + r * (size + gap), { design: (r + c) % 2 ? monsters : blobs });
+    grid += avatar(NAMES[r * 4 + c], size, x0 + c * (size + gap), y0 + r * (size + gap), { design: DESIGNS[(r + c) % DESIGNS.length] });
   }
   return image(w, h, `<rect width="${w}" height="${h}" fill="${t.bg}"/>`
     + avatar("openblobs", 96, 80, 150, { background: "squircle", mood: "happy" })
@@ -36,15 +39,16 @@ function banner(t) {
 
 // A seed becomes the same avatar every time, in every design
 function howItWorks() {
-  const w = 1000, h = 420, t = LIGHT, heading = (x, label) => text(x, 64, 15, t.muted, label, `font-weight="700" letter-spacing="1.5" text-anchor="middle"`);
-  let body = `<rect width="${w}" height="${h}" rx="24" fill="${t.bg}"/>`
-    + text(60, 64, 15, t.muted, "SEED", `font-weight="700" letter-spacing="1.5"`) + heading(588, "BLOBS") + heading(788, "MONSTERS");
-  ["sam@example.com", "01JD8X2K4P", "Ana López"].forEach((seed, i) => {
-    const y = 90 + i * 108;
+  const w = 1100, h = 420, t = LIGHT, size = 92, step = 112, x0 = 520;
+  const heading = (x, label) => text(x, 64, 15, t.muted, label, `font-weight="700" letter-spacing="1.5" text-anchor="middle"`);
+  let body = `<rect width="${w}" height="${h}" rx="24" fill="${t.bg}"/>` + text(60, 64, 15, t.muted, "SEED", `font-weight="700" letter-spacing="1.5"`);
+  DESIGNS.forEach((design, i) => { body += heading(x0 + i * step + size / 2, design.name.toUpperCase()); });
+  ["sam@example.com", "01JD8X2K4P", "Ana López"].forEach((seed, row) => {
+    const y = 90 + row * 108;
     body += `<rect x="60" y="${y + 22}" width="340" height="52" rx="12" fill="${t.card}" stroke="${t.border}"/>`
       + `<text x="80" y="${y + 55}" font-size="22" fill="${t.text}" ${MONO}>"${seed}"</text>`
       + `<path d="M420 ${y + 48}h70m-12 -10 12 10 -12 10" stroke="${t.primary}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`
-      + avatar(seed, 96, 540, y) + avatar(seed, 96, 740, y, { design: monsters });
+      + DESIGNS.map((design, i) => avatar(seed, size, x0 + i * step, y + 2, { design })).join("");
   });
   return image(w, h, body);
 }

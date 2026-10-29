@@ -109,13 +109,15 @@
   .btn.primary:hover { border-color:var(--primary); filter:brightness(1.08); }
 
   /* Design picker: the name, then the team drawn in that design */
-  .design-opts { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 190px), 1fr)); gap:8px; }
-  .design-opt { position:relative; display:block; }
+  /* One row that scrolls sideways, however many designs there are */
+  .design-opts { position:relative; display:flex; gap:8px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-padding:0 2px; padding:2px 2px 8px; margin:0 -2px; scrollbar-width:thin; }
+  .design-opt { position:relative; display:block; flex:0 0 168px; scroll-snap-align:start; }
   .design-opt input { position:absolute; inset:0; opacity:0; margin:0; cursor:pointer; }
   .design-opt-body { display:flex; flex-direction:column; gap:8px; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:var(--bg); cursor:pointer; }
   .design-opt:hover .design-opt-body { border-color:color-mix(in srgb, var(--text) 25%, var(--border)); }
   .design-opt input:checked + .design-opt-body { border-color:var(--primary); box-shadow:inset 0 0 0 1px var(--primary); background:var(--primary-soft); }
   .design-opt input:focus-visible + .design-opt-body { outline:2px solid var(--focus); outline-offset:2px; }
+  legend .count { font-weight:400; color:var(--muted); }
   .design-opt-name { font-size:14px; font-weight:600; text-transform:capitalize; }
   .design-opt-team { display:flex; padding-left:6px; }
   .design-opt-team svg { display:block; margin-left:-6px; border-radius:50%; box-shadow:0 0 0 2px var(--bg); }
@@ -260,7 +262,7 @@
 
       <p class="side-label">Your config</p>
       <fieldset>
-        <legend>Design</legend>
+        <legend>Design <span class="count" id="designCount"></span></legend>
         <div class="design-opts" id="designSeg"></div>
       </fieldset>
       <fieldset>
@@ -393,9 +395,12 @@ function renderPreview() {
 
 function renderAll() {
   const o = opts();
-  // Moods belong to the blobs: other designs have no say in them
-  const faces = o.design === "blobs";
+  // Moods only for designs that draw them
+  const faces = Boolean(DESIGNS[o.design].moods);
   $("moodField").disabled = !faces;
+  // Keep the chosen design in view in its row
+  const strip = $("designSeg"), chosen = strip.querySelector("input:checked").closest(".design-opt");
+  if (chosen.offsetLeft < strip.scrollLeft || chosen.offsetLeft + chosen.offsetWidth > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = chosen.offsetLeft - 2;
   $("h-moods").closest("section").hidden = !faces;
   const own = (n, px) => avatar(n, { ...o, size: px });
   const initials = (n, px) => `<div class="initials" aria-hidden="true" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.38)}px">${n.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase()}</div>`;
@@ -426,7 +431,7 @@ function snippetFor(framework, { design, bg, mood }, seed) {
   const options = [];
   if (design !== "blobs") options.push(["design", id]);
   if (bg !== "circle") options.push(["background", JSON.stringify(bg)]);
-  if (mood !== "auto" && design === "blobs") options.push(["mood", JSON.stringify(mood)]);
+  if (mood !== "auto" && DESIGNS[design].moods) options.push(["mood", JSON.stringify(mood)]);
   const designImport = design === "blobs" ? [] : [`import { ${id} } from "openblobs/designs/${design}";`];
 
   if (framework === "react") {
@@ -473,6 +478,7 @@ const escapeHtml = s => s.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
 
 // The design picker: each option is the design's name, and the team drawn in it
 function designOptions(value) {
+  $("designCount").textContent = `· ${Object.keys(DESIGNS).length}`;
   $("designSeg").innerHTML = Object.entries(DESIGNS).map(([name, design]) =>
     `<label class="design-opt" title="${escapeHtml(design.description ?? "")}">
       <input type="radio" name="design" value="${name}"${name === value ? " checked" : ""}>

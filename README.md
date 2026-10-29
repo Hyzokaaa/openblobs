@@ -4,7 +4,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/banner-dark.svg">
-  <img alt="openblobs: friendly avatars from any string. A grid of blobs and monsters." src="https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/banner-light.svg">
+  <img alt="openblobs: friendly avatars from any string. A grid of blobs, critters, monsters and robots." src="https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/banner-light.svg">
 </picture>
 
 Friendly, deterministic SVG avatars from any string. The same seed always draws the same little creature, and you can bring your own design and keep every guarantee.
@@ -14,7 +14,7 @@ Friendly, deterministic SVG avatars from any string. The same seed always draws 
 - Ink always reaches a 4.5:1 contrast against the body, in the built-in blobs and in your own designs.
 - No element ids, gradients or filters, so any number of avatars can share a page.
 
-![A seed such as sam@example.com always becomes the same blob, and the same monster in the monsters design.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/how-it-works.svg)
+![A seed such as sam@example.com always becomes the same avatar in each design: blobs, critters, monsters and robots.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/how-it-works.svg)
 
 ## Install
 
@@ -55,7 +55,7 @@ Seed with a stable id rather than a name or an email: the avatar survives rename
 |--------------|-------------|---------|
 | `size`       | none        | Width and height in px. Omit it to size with CSS. |
 | `background` | `"circle"`  | `"circle"`, `"squircle"` or `"none"`. |
-| `mood`       | from seed   | `calm`, `happy`, `sleepy`, `surprised` or `busy`. Only the face changes. Blobs only. |
+| `mood`       | from seed   | `calm`, `happy`, `sleepy`, `surprised` or `busy`. Only the face changes. Every bundled design has moods; designs without them ignore it. |
 | `title`      | none        | Accessible name. Without it the avatar is decorative. |
 | `design`     | `blobs`     | What to draw. See below. |
 
@@ -75,8 +75,12 @@ openblob(user.id, { design: monsters });
 
 | Design     | Looks like |
 |------------|------------|
-| `blobs`    | Blobs, pebbles, beans and drops, with moods. The default. |
-| `monsters` | Horned, one-eyed or sleepy monsters. |
+| `blobs`    | Blobs, pebbles, beans and drops. The default. |
+| `critters` | Cats, bears and bunnies with button noses. |
+| `monsters` | Horned, one-eyed or furry monsters. |
+| `robots`   | Robots with a screen for a face, antennas and bolts. |
+
+All of them draw the five moods, and a person keeps their features in every mood: only the expression changes.
 
 Want to add one? See [Contributing](CONTRIBUTING.md#adding-a-design): a design is one file of SVG parts, and the tests check the rest.
 
@@ -125,6 +129,23 @@ const rings = defineDesign({
 ```
 
 `draw` returns the SVG elements without the `<svg>` wrapper, and the colour of the backdrop (leave it out for none). openblobs adds the wrapper, the size, the backdrop and the accessible name. The built-in `blobs` are written with this same API.
+
+### With moods
+
+A layer can give its parts per mood. List the same number of parts for every mood, in the same order, and the seed picks the same feature in each: a one-eyed monster stays one-eyed and only its expression changes. `calm` is required and stands in for any mood you leave out.
+
+```ts
+layers: [
+  bodies,
+  {
+    calm:   [twoEyes, oneEye],
+    happy: [twoHappyEyes, oneHappyEye],
+    sleepy: [twoClosedEyes, oneClosedEye],
+  },
+]
+```
+
+The mood comes from the seed, or from the `mood` option. `design.moods` lists the moods a design draws.
 
 ### Keeping your design stable
 

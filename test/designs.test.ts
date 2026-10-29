@@ -56,6 +56,18 @@ describe.each(designs)("%s", (name, design) => {
     }
   });
 
+  it("draws every mood it lists, each one different", () => {
+    for (const seed of design.moods ? seeds.slice(0, 40) : []) {
+      const faces = design.moods!.map((mood) => openblob(seed, { design, mood }));
+      expect(new Set(faces).size).toBe(design.moods!.length);
+      for (const svg of faces) {
+        expect(svg).not.toMatch(LEAKS);
+        expect(svg).not.toMatch(/\{\w+\}|NaN|undefined|Infinity|null/);
+        expect(balanced(svg)).toBe(true);
+      }
+    }
+  });
+
   it("stays small", () => {
     for (const svg of drawings) expect(svg.length).toBeLessThan(8000);
   });

@@ -163,4 +163,41 @@ describe("designs", () => {
   it("rejects a layer without parts", () => {
     expect(() => layeredDesign({ name: "broken", layers: [[]] })).toThrow(/layer 0/);
   });
+
+  describe("with moods", () => {
+    const faces = layeredDesign({
+      name: "moody",
+      layers: [
+        ['<circle r="1"/>', '<circle r="2"/>', '<circle r="3"/>'],
+        { calm: ['<g data-calm="0"/>', '<g data-calm="1"/>'], happy: ['<g data-happy="0"/>', '<g data-happy="1"/>'] },
+        ['<rect width="1"/>', '<rect width="2"/>'],
+      ],
+    });
+
+    it("lists the moods it can draw", () => {
+      expect(faces.moods).toEqual(["calm", "happy"]);
+      expect(layeredDesign({ name: "plain", layers: [["<g/>"]] }).moods).toBeUndefined();
+    });
+
+    it("changes only the expression when the mood is forced, and keeps the feature", () => {
+      for (const s of seeds.slice(0, 200)) {
+        const calm = openblob(s, { design: faces, mood: "calm" });
+        expect(openblob(s, { design: faces, mood: "happy" })).toBe(calm.replace('data-calm="', 'data-happy="'));
+      }
+    });
+
+    it("draws the mood from the seed when it is not forced", () => {
+      const drawn = seeds.slice(0, 200).map((s) => openblob(s, { design: faces }));
+      expect(drawn.some((svg) => svg.includes("data-calm"))).toBe(true);
+      expect(drawn.some((svg) => svg.includes("data-happy"))).toBe(true);
+    });
+
+    it("falls back to calm for a mood the design leaves out", () => {
+      expect(openblob("a", { design: faces, mood: "sleepy" })).toBe(openblob("a", { design: faces, mood: "calm" }));
+    });
+
+    it("asks every mood for as many parts as calm", () => {
+      expect(() => layeredDesign({ name: "uneven", layers: [{ calm: ["<g/>", "<g/>"], happy: ["<g/>"] }] })).toThrow(/1 happy parts for 2 calm/);
+    });
+  });
 });

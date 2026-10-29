@@ -1,17 +1,17 @@
 import { context, type DesignContext } from "./design.js";
 import { BACKGROUND_SHIFTS, type Palette } from "./palette.js";
+import { MOOD_DRAW, type Mood } from "./moods.js";
+
+export { MOODS, type Mood } from "./moods.js";
 
 export const SHAPES = ["blob", "pebble", "bean", "drop"] as const;
 export const TOPS = ["none", "antenna", "sprout", "tuft", "headset", "ears"] as const;
-export const MOODS = ["calm", "happy", "sleepy", "surprised", "busy"] as const;
 
 export type Shape = (typeof SHAPES)[number];
 export type Top = (typeof TOPS)[number];
-export type Mood = (typeof MOODS)[number];
 
-// Weighted draws: plain heads and calm faces are the most common.
+// Weighted draw: plain heads are the most common.
 const TOP_DRAW: Top[] = ["none", "none", "antenna", "sprout", "tuft", "headset", "ears"];
-const MOOD_DRAW: Mood[] = ["calm", "calm", "calm", "happy", "happy", "sleepy", "surprised", "busy"];
 
 export interface Traits {
   hue: number;
