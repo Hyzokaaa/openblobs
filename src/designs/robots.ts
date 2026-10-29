@@ -13,24 +13,24 @@ export const robots = layeredDesign({
   name: "robots",
   description: "Robots with a screen for a face, antennas and bolts, in five moods.",
   layers: [
-    // Ears, drawn first so the head hides their base
+    // Ears, drawn before the head so it hides their base
     [
       "",
       "",
       `<rect x="13" y="44" width="12" height="22" rx="5" fill="{gear}"/><rect x="75" y="44" width="12" height="22" rx="5" fill="{gear}"/>`,
+    ],
+    // Antennas, behind the head: their base reaches y 36, inside every head, so none of them floats
+    [
+      "",
+      `<path d="M50 36V15" stroke="{gear}" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="12" r="5" fill="{accent}"/>`,
+      `<path d="M42.2 36 33 16M57.8 36 67 16" stroke="{gear}" stroke-width="3.4" stroke-linecap="round"/><circle cx="32" cy="14" r="4" fill="{accent}"/><circle cx="68" cy="14" r="4" fill="{accent}"/>`,
+      `<rect x="43" y="19" width="14" height="17" rx="3" fill="{gear}"/><circle cx="50" cy="16" r="3.5" fill="{accent}"/>`,
     ],
     // Heads
     [
       `<rect x="22" y="26" width="56" height="56" rx="16" fill="{body}"/>`,
       `<rect x="19" y="30" width="62" height="50" rx="13" fill="{body}"/>`,
       `<path d="M24 52a26 26 0 0 1 52 0v18a11 11 0 0 1-11 11H35a11 11 0 0 1-11-11z" fill="{body}"/>`,
-    ],
-    // Antennas
-    [
-      "",
-      `<path d="M50 27V15" stroke="{gear}" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="12" r="5" fill="{accent}"/>`,
-      `<path d="M39 29 33 16M61 29l6-13" stroke="{gear}" stroke-width="3.4" stroke-linecap="round"/><circle cx="32" cy="14" r="4" fill="{accent}"/><circle cx="68" cy="14" r="4" fill="{accent}"/>`,
-      `<rect x="43" y="19" width="14" height="9" rx="3" fill="{gear}"/><circle cx="50" cy="16" r="3.5" fill="{accent}"/>`,
     ],
     // Screens
     [
