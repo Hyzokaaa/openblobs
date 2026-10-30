@@ -1,6 +1,6 @@
 {
   "name": "openblobs",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Deterministic, friendly SVG avatars from any string, in built-in designs or your own. Zero dependencies.",
   "license": "MIT",
   "author": "Luis Miguel Lagos Xenes",
