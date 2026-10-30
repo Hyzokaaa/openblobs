@@ -5,6 +5,7 @@
 ### Added
 
 - `blobs.with({ shape, top })` keeps the blobs to the shapes or tops you choose, one or a list: `blobs.with({ top: "headset" })` gives everyone a headset. Each person keeps their colours, face and mood, and seeds that already have an allowed shape or top draw exactly as before. `traitsOf(seed, choice)` takes the same choice. The default `blobs` draw as before: same `GENERATION`.
+- The demo has a Top picker for blobs, which shows `blobs.with({ top })` across the page and in the code, and opens on one with `?top=<top>`.
 
 ## 0.2.0 (2026-10-29)
 

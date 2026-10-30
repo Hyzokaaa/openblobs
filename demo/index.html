@@ -64,6 +64,7 @@
   .seg input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
   .seg span { display:block; padding:6px 12px; border-radius:7px; font-size:14px; color:var(--muted); cursor:pointer; }
   .seg label:hover span { color:var(--text); }
+  #topSeg span { padding:6px 9px; }
   .seg input:checked + span { background:var(--primary); color:var(--on-primary); }
   .seg input:focus-visible + span { outline:2px solid var(--focus); outline-offset:1px; }
 
@@ -269,6 +270,10 @@
         <legend>Background</legend>
         <div class="seg" id="bgSeg"></div>
       </fieldset>
+      <fieldset id="topField">
+        <legend>Top <span class="count">blobs.with()</span></legend>
+        <div class="seg" id="topSeg"></div>
+      </fieldset>
       <fieldset id="moodField">
         <legend>Mood</legend>
         <div class="seg" id="moodSeg"></div>
@@ -350,10 +355,15 @@ const $ = id => document.getElementById(id);
 const pick = list => list[Math.floor(Math.random() * list.length)];
 // Every design in src/designs shows up here on its own, in the order of the registry
 const DESIGNS = Object.fromEntries([blobs, ...designs].map(design => [design.name, design]));
-const avatar = (seed, { size, bg, mood, design }) =>
-  openblob(seed, { size, background: bg, mood: mood === "auto" ? undefined : mood, design: DESIGNS[design] });
+// Blobs limited to one top, made once per top: blobs.with({ top })
+const TOPPED = {};
+const designOf = (design, top = "any") =>
+  design !== "blobs" || top === "any" ? DESIGNS[design] : (TOPPED[top] ??= blobs.with({ top }));
+const avatar = (seed, { size, bg, mood, design, top }) =>
+  openblob(seed, { size, background: bg, mood: mood === "auto" ? undefined : mood, design: designOf(design, top) });
 
 const BACKGROUNDS = [["circle", "Circle"], ["squircle", "Squircle"], ["none", "None"]];
+const TOPS = [["any", "Any"], ["none", "None"], ["antenna", "Antenna"], ["sprout", "Sprout"], ["tuft", "Tuft"], ["headset", "Headset"], ["ears", "Ears"]];
 const MOODS = [["auto", "From seed"], ["calm", "Calm"], ["happy", "Happy"], ["sleepy", "Sleepy"], ["surprised", "Surprised"], ["busy", "Busy"]];
 const NAMES = ["Sam Porter", "Carla Méndez", "Leo Martín", "Clara Pérez", "Ana López", "admin@example.net", "hello@example.com", "María José", "John Smith", "01JD8X2K4P", "Priya Natarajan", "Øyvind Hansen", "李伟", "Fatima Zahra", "Tom O'Brien", "Lucía Fernández", "Kenji Watanabe", "Olga Ivanova", "Pedro Sánchez", "Emma Wilson", "noreply@example.org", "Sven Berg", "Aisha Bello", "Diego Ramírez", "Chloé Martin", "Yusuf Kaya", "Nadia Petrov", "Raúl Costa", "Grace Hill", "Ada Lane", "Linus K.", "Marta Gil", "Hugo Duarte", "Iris Novak", "Pablo Ruiz", "Sara Cohen", "Ivan Horvat", "Elena Rossi", "Mateo Vargas", "Zoe Clarke"];
 const TEAM = [["Sam Porter", "Design", "online"], ["Carla Méndez", "Engineering", "online"], ["Clara Pérez", "Engineering", "away"], ["Carlos Pinto", "Product", "online"], ["Ana López", "Marketing", "offline"]];
@@ -382,7 +392,7 @@ function segmented(container, name, options, value) {
     `<label><input type="radio" name="${name}" value="${v}"${v === value ? " checked" : ""}><span>${label}</span></label>`).join("");
 }
 const choice = name => document.querySelector(`input[name="${name}"]:checked`).value;
-const opts = () => ({ design: choice("design"), bg: choice("bg"), mood: choice("mood") });
+const opts = () => ({ design: choice("design"), bg: choice("bg"), mood: choice("mood"), top: choice("top") });
 
 function renderPreview() {
   const seed = $("seed").value, o = opts();
@@ -398,6 +408,8 @@ function renderAll() {
   // Moods only for designs that draw them
   const faces = Boolean(DESIGNS[o.design].moods);
   $("moodField").disabled = !faces;
+  // Tops belong to the blobs
+  $("topField").hidden = o.design !== "blobs";
   // Keep the chosen design in view in its row
   const strip = $("designSeg"), chosen = strip.querySelector("input:checked").closest(".design-opt");
   if (chosen.offsetLeft < strip.scrollLeft || chosen.offsetLeft + chosen.offsetWidth > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = chosen.offsetLeft - 2;
@@ -426,24 +438,29 @@ const camel = name => name.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
 const MANAGERS = [["npm", "npm install"], ["pnpm", "pnpm add"], ["yarn", "yarn add"], ["bun", "bun add"]];
 const FRAMEWORKS = [["react", "React", "Avatar.tsx"], ["js", "JavaScript", "avatar.js"], ["uri", "Any framework", "avatar.js"]];
 
-function snippetFor(framework, { design, bg, mood }, seed) {
+function snippetFor(framework, { design, bg, mood, top }, seed) {
   const lines = [], quoted = JSON.stringify(seed || "?"), id = camel(design);
-  const options = [];
+  const options = [], topped = design === "blobs" && top !== "any";
   if (design !== "blobs") options.push(["design", id]);
+  if (topped) options.push(["design", "myBlobs"]);
   if (bg !== "circle") options.push(["background", JSON.stringify(bg)]);
   if (mood !== "auto" && DESIGNS[design].moods) options.push(["mood", JSON.stringify(mood)]);
   const designImport = design === "blobs" ? [] : [`import { ${id} } from "openblobs/designs/${design}";`];
+  // Made once, outside any component, so it is not redrawn on every render
+  const made = topped ? ["", `const myBlobs = blobs.with({ top: ${JSON.stringify(top)} });`] : [];
+  const core = names => (topped ? ["blobs", ...names] : names).sort();
+  const coreImport = names => core(names).length ? [`import { ${core(names).join(", ")} } from "openblobs";`] : [];
 
   if (framework === "react") {
     const attr = ([key, value]) => (value.startsWith('"') ? `${key}=${value}` : `${key}={${value}}`);
-    lines.push(`import { Openblob } from "openblobs/react";`, ...designImport, "", "<Openblob",
+    lines.push(...coreImport([]), `import { Openblob } from "openblobs/react";`, ...designImport, ...made, "", "<Openblob",
       `  seed=${/["\\{}]/.test(seed) ? `{${quoted}}` : quoted}`, "  size={48}", ...options.map(o => `  ${attr(o)}`), "/>");
   } else if (framework === "js") {
-    lines.push(`import { openblob } from "openblobs";`, ...designImport, "",
+    lines.push(...coreImport(["openblob"]), ...designImport, ...made, "",
       `const svg = openblob(${quoted}, {`, "  size: 48,", ...options.map(([k, v]) => `  ${k}: ${v},`), "});");
   } else {
     const object = options.length ? `, { ${options.map(([k, v]) => `${k}: ${v}`).join(", ")} }` : "";
-    lines.push(`import { openblobUri } from "openblobs";`, ...designImport, "",
+    lines.push(...coreImport(["openblobUri"]), ...designImport, ...made, "",
       "// A data URI: works in any <img>, in Vue, Svelte, emails…", `img.src = openblobUri(${quoted}${object});`);
   }
   return lines.join("\n");
@@ -616,7 +633,7 @@ copier($("copyBtn"), $("snippet"));
 copier($("copyInstall"), $("installCmd"));
 copier($("copyDesignBtn"), $("designSnippet"));
 
-// ?design=monsters opens the demo on that design, handy to link from a pull request
+// ?design=monsters opens the demo on that design, and ?top=headset on blobs with that top, handy to link from a pull request
 const wanted = new URLSearchParams(location.search).get("design");
 designOptions(Object.hasOwn(DESIGNS, wanted ?? "") ? wanted : "blobs");
 segmented($("bgSeg"), "bg", BACKGROUNDS, "circle");
@@ -624,7 +641,9 @@ segmented($("pmSeg"), "pm", MANAGERS.map(([id]) => [id, id]), recall("openblobs-
 segmented($("fwSeg"), "fw", FRAMEWORKS.map(([id, label]) => [id, label]), recall("openblobs-fw", "react", FRAMEWORKS.map(([id]) => id)));
 ["pmSeg", "fwSeg"].forEach(id => $(id).addEventListener("change", renderCode));
 segmented($("moodSeg"), "mood", MOODS, "auto");
-["designSeg", "bgSeg", "moodSeg"].forEach(id => $(id).addEventListener("change", renderAll));
+const wantedTop = new URLSearchParams(location.search).get("top");
+segmented($("topSeg"), "top", TOPS, TOPS.some(([v]) => v === wantedTop) ? wantedTop : "any");
+["designSeg", "bgSeg", "moodSeg", "topSeg"].forEach(id => $(id).addEventListener("change", renderAll));
 let draft = null;
 try { draft = localStorage.getItem("openblobs-parts"); } catch {}
 $("parts").value = draft || STARTER;
