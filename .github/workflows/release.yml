@@ -1,7 +1,7 @@
 name: Release
 
 # Every push to main: if the commits since the last tag hold a feat, fix, perf or breaking change,
-# bump the version, publish to npm, and push the release commit and tag to GitHub and the GitLab mirror.
+# bump the version, publish to npm, and push the release commit and tag to GitHub only.
 on:
   push:
     branches: [main]
@@ -42,7 +42,6 @@ jobs:
       - if: steps.version.outputs.version
         env:
           VERSION: ${{ steps.version.outputs.version }}
-          GITLAB_PUSH_URL: ${{ secrets.GITLAB_PUSH_URL }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -50,5 +49,3 @@ jobs:
           git commit -m "chore: release v${VERSION}"
           git tag "v${VERSION}"
           git push origin HEAD:main "v${VERSION}"
-          # Keep the mirror in step; skipped until the secret exists
-          if [ -n "$GITLAB_PUSH_URL" ]; then git push "$GITLAB_PUSH_URL" HEAD:main "v${VERSION}"; fi
