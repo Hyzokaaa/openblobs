@@ -13,6 +13,7 @@
 
 ### Changed
 
+- The monsters' mouths: fangs now hang whole from the lip, and a third option, `toothy`, opens a dark mouth with white fangs inside (`mouth` is `plain`, `fangs` or `toothy`). This redraws the mouth of some monsters drawn with 0.2.0.
 - The bundled designs name their layers. Every avatar draws exactly as before: same snapshots, same `GENERATION`.
 - Designs in `src/designs` name their parts: the tests check that each option draws something different and leaves seeds that already have it unchanged.
 
