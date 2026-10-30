@@ -91,6 +91,67 @@ describe("openblob", () => {
   });
 });
 
+describe("blobs.with", () => {
+  const few = seeds.slice(0, 300);
+  const without = (svg: string) => traitsOf; // placeholder removed below
+  void without;
+
+  it("gives everyone the allowed top", () => {
+    for (const s of few) expect(traitsOf(s, { top: "headset" }).top).toBe("headset");
+  });
+
+  it("chooses among several allowed values, and uses them all", () => {
+    const tops = new Set(few.map((s) => traitsOf(s, { top: ["headset", "antenna"] }).top));
+    expect([...tops].sort()).toEqual(["antenna", "headset"]);
+    const shapes = new Set(few.map((s) => traitsOf(s, { shape: ["bean", "drop"] }).shape));
+    expect([...shapes].sort()).toEqual(["bean", "drop"]);
+  });
+
+  it("keeps everything else about each person", () => {
+    for (const s of few) {
+      const { top, ...rest } = traitsOf(s);
+      const { top: limited, ...same } = traitsOf(s, { top: "headset" });
+      expect(same).toEqual(rest);
+      expect(limited).toBe("headset");
+    }
+  });
+
+  it("leaves seeds whose top is allowed exactly as they were", () => {
+    const design = blobs.with({ top: ["headset", "none"] });
+    for (const s of few.filter((s) => ["headset", "none"].includes(traitsOf(s).top))) {
+      expect(openblob(s, { design })).toBe(openblob(s));
+    }
+  });
+
+  it("draws the chosen top, in every mood", () => {
+    const design = blobs.with({ top: "headset" });
+    for (const s of few) {
+      const svg = openblob(s, { design });
+      expect(svg).toBe(openblob(s, { design }));
+      expect(svg).not.toMatch(/NaN|undefined|Infinity/);
+    }
+    for (const mood of MOODS) expect(openblob("sam", { design, mood })).toBe(openblob("sam", { design: blobs.with({ top: "headset" }), mood }));
+  });
+
+  it("combines choices, the later one winning per trait", () => {
+    const design = blobs.with({ top: "antenna" }).with({ shape: "drop" });
+    const t = traitsOf("sam", { top: "antenna", shape: "drop" });
+    expect([t.top, t.shape]).toEqual(["antenna", "drop"]);
+    expect(openblob("sam", { design })).toBe(openblob("sam", { design: blobs.with({ top: "antenna", shape: "drop" }) }));
+    expect(openblob("sam", { design: design.with({ top: "headset" }) })).toBe(openblob("sam", { design: blobs.with({ top: "headset", shape: "drop" }) }));
+  });
+
+  it("rejects unknown or empty choices", () => {
+    expect(() => blobs.with({ top: "hat" as never })).toThrow(/Unknown top "hat"/);
+    expect(() => blobs.with({ shape: [] })).toThrow(/No shape allowed/);
+  });
+
+  it("leaves the default blobs alone", () => {
+    expect(blobs.with({})).not.toBe(blobs);
+    for (const s of few.slice(0, 50)) expect(openblob(s, { design: blobs.with({}) })).toBe(openblob(s));
+  });
+});
+
 describe("designs", () => {
   const dot = defineDesign({
     name: "dot",

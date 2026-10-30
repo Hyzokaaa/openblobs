@@ -2,13 +2,14 @@ import { blobs } from "./blobs.js";
 import { context, type OpenblobOptions } from "./design.js";
 
 export { blobs } from "./blobs.js";
+export type { BlobsDesign } from "./blobs.js";
 export { defineDesign, layeredDesign } from "./design.js";
 export type { Background, Design, DesignContext, Drawing, Layer, LayeredDesignOptions, MoodParts, OpenblobOptions } from "./design.js";
 export { MIN_CONTRAST, MIN_GEAR_CONTRAST } from "./palette.js";
 export type { Palette, PaletteChoice } from "./palette.js";
 export type { Random } from "./random.js";
 export { traitsOf, SHAPES, TOPS, MOODS } from "./traits.js";
-export type { Mood, Shape, Top, Traits } from "./traits.js";
+export type { BlobChoice, Mood, Shape, Top, Traits } from "./traits.js";
 
 /**
  * Generation of the built-in `blobs` design. Bumped only when the same seed would draw a different

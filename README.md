@@ -84,7 +84,19 @@ All of them draw the five moods, and a person keeps their features in every mood
 
 ![One seed in five moods, calm, happy, sleepy, surprised and busy: big as a blob, and small as a monster, a robot and a critter below each.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/moods.svg)
 
-Want to add one? See [Contributing](CONTRIBUTING.md#adding-a-design): a design is one file of SVG parts, and the tests check the rest.
+### Only some shapes or tops
+
+`blobs.with()` keeps the blobs to the shapes or tops you choose, for example a headset for every support agent:
+
+```ts
+const agents = blobs.with({ top: "headset" });
+
+openblob(agent.id, { design: agents });
+```
+
+Each person keeps their colours, face and mood, so the agent is still recognisably the same blob. Seeds that already have an allowed top or shape draw exactly as before. Pass a list to choose among several: `blobs.with({ top: ["headset", "antenna"], shape: "bean" })`. Shapes are `blob`, `pebble`, `bean` and `drop`; tops are `none`, `antenna`, `sprout`, `tuft`, `headset` and `ears` (also exported as `SHAPES` and `TOPS`).
+
+Want to add a design? See [Contributing](CONTRIBUTING.md#adding-a-design): a design is one file of SVG parts, and the tests check the rest.
 
 ## Your own design
 
