@@ -79,6 +79,7 @@ openblob(user.id, { design: monsters });
 | `monsters` | Horned, one-eyed or furry monsters. |
 | `robots`   | Robots with a screen for a face, antennas and bolts. |
 | `critters` | Cats, bears and bunnies with button noses. |
+| `cacti`    | Potted cacti with arms, spines and now and then a flower. |
 
 All of them draw the five moods, and a person keeps their features in every mood: only the expression changes.
 
@@ -104,6 +105,7 @@ Each person keeps everything else, so the agent is still recognisably the same b
 | `monsters` | `horns`, `body`, `eyes`, `mouth`, `cheeks` |
 | `robots`   | `ears`, `antenna`, `head`, `screen`, `eyes`, `mouth`, `lights` |
 | `critters` | `ears`, `head`, `markings`, `eyes`, `mouth`, `cheeks` |
+| `cacti`    | `arms`, `body`, `eyes`, `mouth`, `cheeks`, `flower`, `pot` |
 
 The [demo](https://hyzokaaa.github.io/openblobs/) points at every part of the avatar and draws its options on your seed: pick one and it writes the `with()` for you.
 

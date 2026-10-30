@@ -436,14 +436,14 @@
       <div class="play-editor">
         <label class="field-label" for="parts">Parts, in a 100 × 100 box</label>
         <textarea id="parts" spellcheck="false" autocomplete="off" aria-describedby="partsHelp"></textarea>
-        <p class="muted" id="partsHelp">One part per line, <code>---</code> between layers, <code>(none)</code> for a part that draws nothing, <code>#</code> for notes. Colours: <code>{body}</code> <code>{ink}</code> <code>{shade}</code> <code>{gear}</code> <code>{accent}</code> <code>{blush}</code>.</p>
+        <p class="muted" id="partsHelp">One part per line, <code>---</code> between layers, <code>(none)</code> for a part that draws nothing, <code>#</code> for notes, <code>hues: 120 140</code> to keep to some colours. Colours: <code>{body}</code> <code>{ink}</code> <code>{shade}</code> <code>{gear}</code> <code>{accent}</code> <code>{blush}</code>.</p>
       </div>
       <div class="play-preview">
         <div class="play-grid" id="playGrid" aria-live="off"></div>
         <p class="play-error" id="playError" role="status"></p>
         <div class="play-actions">
           <label class="sr-only" for="designName">Design name</label>
-          <input id="designName" type="text" value="robots" autocomplete="off" spellcheck="false" aria-describedby="nameHelp">
+          <input id="designName" type="text" value="cacti" autocomplete="off" spellcheck="false" aria-describedby="nameHelp">
           <button class="btn primary" id="copyDesignBtn" type="button">Copy as a design file</button>
         </div>
         <p class="muted" id="nameHelp">Lower-case name. The file goes in <code>src/designs/</code>: <a href="https://github.com/Hyzokaaa/openblobs/blob/main/CONTRIBUTING.md#adding-a-design">contributing guide</a>.</p>
@@ -1041,21 +1041,38 @@ function renderBelow() {
 }
 
 // Playground: parts in plain text, drawn with layeredDesign as you type
-const STARTER = `# body: one part per line, in a 100 × 100 box; "name: <svg>" names the option
-round: <circle cx="50" cy="54" r="30" fill="{body}"/>
-square: <rect x="22" y="26" width="56" height="56" rx="18" fill="{body}"/>
+const STARTER = `# Potted cacti: one part per line, in a 100 × 100 box; "name: <svg>" names the option
+hues: 85 100 115 130 145 160
+---
+# arms, behind the body
+(none)
+one: <rect x="15" y="36" width="11" height="22" rx="5.5" fill="{shade}"/><rect x="15" y="48" width="26" height="10" rx="5" fill="{shade}"/>
+two: <rect x="15" y="36" width="11" height="22" rx="5.5" fill="{shade}"/><rect x="15" y="48" width="26" height="10" rx="5" fill="{shade}"/><rect x="74" y="30" width="11" height="22" rx="5.5" fill="{shade}"/><rect x="59" y="42" width="26" height="10" rx="5" fill="{shade}"/>
+---
+# body, with spines
+tall: <rect x="33" y="20" width="34" height="58" rx="17" fill="{body}"/><path d="M40 30v0M60 33v0M38 67v0M62 65v0M50 25v0" stroke="{shade}" stroke-width="2.6" stroke-linecap="round"/>
+round: <rect x="29" y="30" width="42" height="48" rx="21" fill="{body}"/><path d="M37 44v0M63 42v0M36 67v0M64 66v0M50 35v0" stroke="{shade}" stroke-width="2.6" stroke-linecap="round"/>
 ---
 # eyes
-dots: <circle cx="40" cy="50" r="4.5" fill="{ink}"/><circle cx="60" cy="50" r="4.5" fill="{ink}"/>
-lines: <path d="M35 50h10M55 50h10" stroke="{ink}" stroke-width="3.4" stroke-linecap="round"/>
+dots: <circle cx="44" cy="50" r="3.3" fill="{ink}"/><circle cx="56" cy="50" r="3.3" fill="{ink}"/>
+shiny: <circle cx="42.5" cy="50" r="4.2" fill="{ink}"/><circle cx="43.97" cy="48.32" r="1.344" fill="#fff"/><circle cx="57.5" cy="50" r="4.2" fill="{ink}"/><circle cx="58.97" cy="48.32" r="1.344" fill="#fff"/>
 ---
-# mouth: (none) draws nothing for some seeds
-smile: <path d="M43 63q7 6 14 0" stroke="{ink}" stroke-width="3.4" stroke-linecap="round" fill="none"/>
-(none)
+# mouth
+smile: <path d="M46 57.5q4 3.5 8 0" stroke="{ink}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+grin: <path d="M44 57q6 5 12 0" stroke="{ink}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 ---
-# hat
+# cheeks: (none) twice makes them rarer
 (none)
-antenna: <path d="M50 25v-9" stroke="{gear}" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="13" r="4.5" fill="{accent}"/>
+(none)
+blush: <ellipse cx="38.5" cy="57" rx="3.6" ry="2.2" fill="#f78fb3" opacity=".6"/><ellipse cx="61.5" cy="57" rx="3.6" ry="2.2" fill="#f78fb3" opacity=".6"/>
+---
+# flower
+(none)
+bloom: <circle cx="58" cy="25.8" r="3.3" fill="#f78fb3"/><circle cx="62" cy="28.7" r="3.3" fill="#f78fb3"/><circle cx="60.5" cy="33.4" r="3.3" fill="#f78fb3"/><circle cx="55.5" cy="33.4" r="3.3" fill="#f78fb3"/><circle cx="54" cy="28.7" r="3.3" fill="#f78fb3"/><circle cx="58" cy="30" r="2.6" fill="#fff4b8"/>
+---
+# pot, last so it hides the base of the body
+clay: <path d="M33 78h34l-4 16H37z" fill="#c9653d"/><rect x="29" y="72" width="42" height="9" rx="3" fill="#dc7a4f"/>
+painted: <path d="M33 78h34l-4 16H37z" fill="{accent}"/><rect x="29" y="72" width="42" height="9" rx="3" fill="{accent}"/>
 `;
 // Same rule as the tests: inline SVG must not leak into the page
 const LEAKS = /\bid=|<style|<script|<foreignObject|<image|<use\b|<filter|<mask|<clipPath|Gradient|\bhref=|url\(|\bon\w+=/i;
@@ -1063,12 +1080,17 @@ const COLOURS = ["body", "ink", "shade", "gear", "accent", "background", "blush"
 
 // Blocks between "---" lines are layers. "# eyes" names one; "dots: <svg>" names an option; "(none)" draws nothing.
 const slug = text => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+const huesOf = text => {
+  const m = text.match(/^\s*hues:\s*([\d\s,]+)$/m);
+  const list = m ? m[1].split(/[\s,]+/).filter(Boolean).map(Number).filter(n => n >= 0 && n <= 360) : [];
+  return list.length ? list : undefined;
+};
 function parseParts(text) {
   const taken = new Set();
   return text.split(/^\s*---\s*$/m).map(block => {
-    const lines = block.split("\n").map(line => line.trim()).filter(Boolean);
+    const lines = block.split("\n").map(line => line.trim()).filter(line => line && !/^hues:/.test(line));
     const heading = lines.find(line => line.startsWith("#"));
-    let name = slug(heading?.slice(1).split(":")[0] ?? "") || "layer";
+    let name = slug(heading?.slice(1).split(/[:,]/)[0] ?? "") || "layer";
     for (let n = 2; taken.has(name); n++) name = name.replace(/-\d+$/, "") + "-" + n;
     const options = [], parts = [];
     for (const line of lines.filter(line => !line.startsWith("#"))) {
@@ -1096,14 +1118,14 @@ function centreOf(parts) {
   return x0 === Infinity ? [50, 50] : [Math.round((x0 + x1) / 2), Math.round((y0 + y1) / 2)];
 }
 
-function designFile(name, layers) {
+function designFile(name, layers, hues) {
   const literal = s => "`" + s.replace(/[`\\$]/g, "\\const params = new URLSearchParams(location.search);") + "`";
   return `import { layeredDesign } from "../design.js";
 
 export const ${camel(name)} = layeredDesign({
   name: "${name}",
   description: "One line on what it draws.",
-  layers: [
+${hues ? `  hues: [${hues.join(", ")}],\n` : ""}  layers: [
 ${layers.map(layer => `    {
       name: ${JSON.stringify(layer.name)},
       options: [${layer.options.map(o => JSON.stringify(o)).join(", ")}],
@@ -1126,14 +1148,14 @@ function renderPlay() {
     : !/^[a-z][a-z0-9-]{1,30}$/.test(name) ? "The name takes lower-case letters, digits and dashes."
     : "";
   if (layers.length) {
-    const design = layeredDesign({ name: "playground", layers: layers.map(({ parts }) => parts) });
+    const design = layeredDesign({ name: "playground", layers: layers.map(({ parts }) => parts), hues: huesOf($("parts").value) });
     // As <img>, so whatever is typed here never runs on the page
     $("playGrid").innerHTML = NAMES.slice(0, 12).map(n => `<img src="${openblobUri(n, { design, background: state.bg })}" alt="">`).join("");
   }
   $("playError").textContent = error;
-  $("designSnippet").textContent = designFile(name || "mine", layers);
+  $("designSnippet").textContent = designFile(name || "mine", layers, huesOf($("parts").value));
   $("copyDesignBtn").disabled = Boolean(error);
-  try { localStorage.setItem("openblobs-parts", $("parts").value); } catch {}
+  try { localStorage.setItem("openblobs-parts-2", $("parts").value); } catch {}
 }
 
 
@@ -1147,7 +1169,7 @@ $("grid").addEventListener("click", e => {
   announce(`Loaded ${cell.dataset.seed}`);
 });
 let draft = null;
-try { draft = localStorage.getItem("openblobs-parts"); } catch {}
+try { draft = localStorage.getItem("openblobs-parts-2"); } catch {}
 $("parts").value = draft || STARTER;
 $("parts").addEventListener("input", renderPlay);
 $("designName").addEventListener("input", renderPlay);
