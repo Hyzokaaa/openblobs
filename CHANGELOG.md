@@ -4,7 +4,7 @@
 
 ### Added
 
-- A fifth design, `cacti`: potted cacti with arms, spines and now and then a flower, in greens and in five moods. `import { cacti } from "openblobs/designs/cacti"`.
+- A fifth design, `cacti`: potted cacti with arms, spines and now and then a flower or a cowboy hat, in greens and in five moods. `import { cacti } from "openblobs/designs/cacti"`.
 - Every design has named parts, and `design.with()` keeps them to the options you choose: `blobs.with({ top: "headset" })`, `monsters.with({ eyes: "one" })`, `robots.with({ antenna: "none" })`. Each person keeps everything else, and seeds that already have an allowed option draw exactly as before. The choice is typed, `design.parts` lists the parts with their options and where they sit, and `traitsOf(seed, choice)` takes the blobs' choice.
 - `layeredDesign` layers can have a name, option names and a position: `{ name: "eyes", options: ["two", "one"], at: [40, 47], parts: [...] }`. Naming changes nothing a seed draws.
 - The demo opens on a stage: the character, large and alive, with your name as its title and its parts around it. Pointing at a part draws a line to it and lights it up; each option is drawn on your seed, framed on the part, and the seed's own pick is marked. Picking one pins it for everyone, with a bounce, and the code in the corner shows the `with()`. The address keeps the design, the parts, the mood and the seed, as in `?design=robots&antenna=none&mood=happy`. The avatar wall, the team list, the comments and the playground below follow what you pin.

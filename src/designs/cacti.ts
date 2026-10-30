@@ -11,6 +11,10 @@ const arm = (x: number, y: number, bar: number, width: number) =>
 const spines = (d: string) => `<path d="${d}" stroke="{shade}" stroke-width="2.6" stroke-linecap="round"/>`;
 const petals = [[0, -4.2], [4, -1.3], [2.5, 3.4], [-2.5, 3.4], [-4, -1.3]]
   .map(([x, y]) => `<circle cx="${58 + x}" cy="${30 + y}" r="3.3" fill="#f78fb3"/>`).join("");
+// Worn low enough to sit on the tall body and on the round one alike
+const hat = `<path d="M38.5 30.5c-1-7.5 0-14 3.6-16 2.8-1.5 5 1 7.9 1s5.1-2.5 7.9-1c3.6 2 4.6 8.5 3.6 16z" fill="#9a6a44"/>`
+  + `<path d="M38.4 26.6h23.2l-.3 3.6H38.7z" fill="#3d2a1d"/>`
+  + `<path d="M26 28.5c4 3.5 10.5 5 24 5s20-1.5 24-5c-.8 5-9.5 8.5-24 8.5s-23.2-3.5-24-8.5z" fill="#7d5233"/>`;
 
 export const cacti = layeredDesign({
   name: "cacti",
@@ -67,12 +71,12 @@ export const cacti = layeredDesign({
       at: [38, 57],
       parts: ["", "", `<ellipse cx="38.5" cy="57" rx="3.6" ry="2.2" fill="#f78fb3" opacity=".6"/><ellipse cx="61.5" cy="57" rx="3.6" ry="2.2" fill="#f78fb3" opacity=".6"/>`],
     },
-    // A flower, now and then
+    // On top, now and then: a flower, or a cowboy hat
     {
-      name: "flower",
-      options: ["none", "bloom"],
-      at: [58, 30],
-      parts: ["", petals + `<circle cx="58" cy="30" r="2.6" fill="#fff4b8"/>`],
+      name: "top",
+      options: ["none", "bloom", "hat"],
+      at: [56, 28],
+      parts: ["", petals + `<circle cx="58" cy="30" r="2.6" fill="#fff4b8"/>`, hat],
     },
     // The pot, drawn last so it hides the base of the body
     {

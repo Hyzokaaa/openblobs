@@ -105,7 +105,7 @@ Each person keeps everything else, so the agent is still recognisably the same b
 | `monsters` | `horns`, `body`, `eyes`, `mouth`, `cheeks` |
 | `robots`   | `ears`, `antenna`, `head`, `screen`, `eyes`, `mouth`, `lights` |
 | `critters` | `ears`, `head`, `markings`, `eyes`, `mouth`, `cheeks` |
-| `cacti`    | `arms`, `body`, `eyes`, `mouth`, `cheeks`, `flower`, `pot` |
+| `cacti`    | `arms`, `body`, `eyes`, `mouth`, `cheeks`, `top`, `pot` |
 
 The [demo](https://hyzokaaa.github.io/openblobs/) points at every part of the avatar and draws its options on your seed: pick one and it writes the `with()` for you.
 
