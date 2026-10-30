@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write # npm provenance
+      id-token: write # trusted publishing and provenance
 
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # npm 11.5 or later publishes through npm's trusted publishing (OIDC), with no token
+          node-version: 24
           cache: npm
           registry-url: https://registry.npmjs.org
 
@@ -33,10 +34,9 @@ jobs:
       - id: version
         run: node scripts/release.mjs
 
-      # prepublishOnly runs the typecheck, the tests and the build first
+      # prepublishOnly runs the typecheck, the tests and the build first.
+      # npm trusts this workflow (package settings, Trusted Publisher), so no token is needed.
       - if: steps.version.outputs.version
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
 
       - if: steps.version.outputs.version
