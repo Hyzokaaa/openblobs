@@ -76,3 +76,5 @@ You do not need to be in this repository: `layeredDesign` and `defineDesign` are
 ## Commits
 
 Short messages in the imperative, with a prefix: `feat:`, `fix:`, `docs:`, `test:`, `chore:`. One topic per pull request.
+
+The prefix decides the release. Every push to `main` runs [`scripts/release.mjs`](scripts/release.mjs): a `feat:` since the last tag publishes a minor version, a `fix:` or `perf:` a patch, and `feat!:` or a `BREAKING CHANGE:` line a major one. Commits with other prefixes release nothing. Write user-facing notes under `## Unreleased` in [CHANGELOG.md](CHANGELOG.md); the release dates that heading. `node scripts/release.mjs --dry` shows what would be released.

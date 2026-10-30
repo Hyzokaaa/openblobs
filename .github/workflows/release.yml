@@ -1,0 +1,54 @@
+name: Release
+
+# Every push to main: if the commits since the last tag hold a feat, fix, perf or breaking change,
+# bump the version, publish to npm, and push the release commit and tag to GitHub and the GitLab mirror.
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write # npm provenance
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - id: version
+        run: node scripts/release.mjs
+
+      # prepublishOnly runs the typecheck, the tests and the build first
+      - if: steps.version.outputs.version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+
+      - if: steps.version.outputs.version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          GITLAB_PUSH_URL: ${{ secrets.GITLAB_PUSH_URL }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore: release v${VERSION}"
+          git tag "v${VERSION}"
+          git push origin HEAD:main "v${VERSION}"
+          # Keep the mirror in step; skipped until the secret exists
+          if [ -n "$GITLAB_PUSH_URL" ]; then git push "$GITLAB_PUSH_URL" HEAD:main "v${VERSION}"; fi
