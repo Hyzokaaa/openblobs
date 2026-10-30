@@ -141,9 +141,17 @@ describe("blobs.with", () => {
     expect(openblob("sam", { design: design.with({ top: "headset" }) })).toBe(openblob("sam", { design: blobs.with({ top: "headset", shape: "drop" }) }));
   });
 
-  it("rejects unknown or empty choices", () => {
-    expect(() => blobs.with({ top: "hat" as never })).toThrow(/Unknown top "hat"/);
-    expect(() => blobs.with({ shape: [] })).toThrow(/No shape allowed/);
+  it("rejects unknown or empty choices, in the types too", () => {
+    // @ts-expect-error: not a top
+    expect(() => blobs.with({ top: "hat" })).toThrow(/"hat" is not an option of "top"; use one of none, antenna/);
+    // @ts-expect-error: not a part
+    expect(() => blobs.with({ hat: "none" })).toThrow(/there is no part "hat"; the parts are shape, top/);
+    expect(() => blobs.with({ shape: [] })).toThrow(/no option is allowed for "shape"/);
+  });
+
+  it("lists its parts with their options", () => {
+    expect(blobs.parts.shape.options).toEqual(["blob", "pebble", "bean", "drop"]);
+    expect(blobs.parts.top.options).toEqual(["none", "antenna", "sprout", "tuft", "headset", "ears"]);
   });
 
   it("leaves the default blobs alone", () => {
@@ -223,6 +231,51 @@ describe("designs", () => {
 
   it("rejects a layer without parts", () => {
     expect(() => layeredDesign({ name: "broken", layers: [[]] })).toThrow(/layer 0/);
+  });
+
+  describe("with named layers", () => {
+    const plain = [['<circle r="1"/>', '<circle r="2"/>', '<circle r="3"/>'], ['<rect width="1"/>', '<rect width="2"/>']] as const;
+    const named = layeredDesign({
+      name: "named",
+      layers: [
+        { name: "dot", options: ["small", "medium", "big"], at: [50, 50], parts: plain[0] },
+        { name: "bar", options: ["thin", "thin"], parts: { calm: ['<rect width="1"/>', '<rect width="2"/>'] } },
+      ],
+    });
+    const unnamed = layeredDesign({ name: "named", layers: [plain[0], { calm: ['<rect width="1"/>', '<rect width="2"/>'] }] });
+
+    it("draws exactly what the same layers draw without names", () => {
+      for (const s of seeds.slice(0, 200)) expect(openblob(s, { design: named })).toBe(openblob(s, { design: unnamed }));
+    });
+
+    it("lists the parts, each option once", () => {
+      expect(named.parts).toEqual({ dot: { options: ["small", "medium", "big"], at: [50, 50] }, bar: { options: ["thin"] } });
+      expect(unnamed.parts).toEqual({});
+    });
+
+    it("keeps everyone to the chosen options, and the rest of each avatar as it was", () => {
+      const big = named.with({ dot: "big" });
+      for (const s of seeds.slice(0, 200)) {
+        expect(openblob(s, { design: big })).toContain('<circle r="3"/>');
+        expect(openblob(s, { design: big }).replace(/<circle r="\d"\/>/, "")).toBe(openblob(s, { design: named }).replace(/<circle r="\d"\/>/, ""));
+      }
+      const either = named.with({ dot: ["small", "big"] });
+      const drawn = new Set(seeds.slice(0, 200).map((s) => openblob(s, { design: either }).match(/<circle r="(\d)"/)![1]));
+      expect([...drawn].sort()).toEqual(["1", "3"]);
+    });
+
+    it("checks the choice in the types", () => {
+      // @ts-expect-error: not an option of dot
+      expect(() => named.with({ dot: "huge" })).toThrow(/"huge" is not an option of "dot"/);
+      // @ts-expect-error: not a part
+      expect(() => named.with({ tail: "long" })).toThrow(/no part "tail"/);
+    });
+
+    it("rejects options that do not match the parts, and repeated names", () => {
+      expect(() => layeredDesign({ name: "x", layers: [{ name: "dot", options: ["a"], parts: ["", "<g/>"] }] })).toThrow(/names 1 options for 2 parts/);
+      expect(() => layeredDesign({ name: "x", layers: [{ name: "dot", options: ["a"], parts: [""] }, { name: "dot", options: ["b"], parts: [""] }] })).toThrow(/two layers are named "dot"/);
+      expect(() => layeredDesign({ name: "x", layers: [{ name: "dot", options: [""], parts: [""] }] })).toThrow(/empty option name/);
+    });
   });
 
   describe("with moods", () => {

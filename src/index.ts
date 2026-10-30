@@ -2,9 +2,9 @@ import { blobs } from "./blobs.js";
 import { context, type OpenblobOptions } from "./design.js";
 
 export { blobs } from "./blobs.js";
-export type { BlobsDesign } from "./blobs.js";
 export { defineDesign, layeredDesign } from "./design.js";
-export type { Background, Design, DesignContext, Drawing, Layer, LayeredDesignOptions, MoodParts, OpenblobOptions } from "./design.js";
+export type { Background, ChoiceOf, Customizable, Design, DesignContext, Drawing, Layer, LayeredDesignOptions, MoodParts, NamedLayer, OpenblobOptions } from "./design.js";
+export type { Choice, Part } from "./choice.js";
 export { MIN_CONTRAST, MIN_GEAR_CONTRAST } from "./palette.js";
 export type { Palette, PaletteChoice } from "./palette.js";
 export type { Random } from "./random.js";

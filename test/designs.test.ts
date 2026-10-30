@@ -74,6 +74,66 @@ describe.each(designs)("%s", (name, design) => {
     for (const svg of drawings) expect(svg.length).toBeLessThan(8000);
   });
 
+  // Parts: what design.with() can choose and what the demo's character points at
+  const parts = Object.entries(design.parts ?? {});
+  const few = seeds.slice(0, 60);
+
+  it("names its parts, each with distinct options and a point on the canvas", () => {
+    expect(parts.length).toBeGreaterThan(0);
+    expect(design.with).toBeTypeOf("function");
+    for (const [part, { options, at }] of parts) {
+      expect(part).toMatch(/^[a-z][a-z0-9-]{1,20}$/);
+      expect(options.length).toBeGreaterThan(1);
+      expect(new Set(options).size).toBe(options.length);
+      for (const option of options) expect(option).toMatch(/^[a-z][a-z0-9-]{1,20}$/);
+      expect(at).toHaveLength(2);
+      for (const v of at!) expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(100);
+    }
+  });
+
+  it("draws everyone as before when every option of a part is allowed", () => {
+    for (const [part, { options }] of parts) {
+      const all = design.with!({ [part]: options });
+      for (const seed of few) expect(openblob(seed, { design: all })).toBe(openblob(seed, { design }));
+    }
+  });
+
+  it("draws each option of each part, different from the others, and keeps a seed's own option as it was", () => {
+    for (const [part, { options }] of parts) {
+      const limited = options.map((option) => design.with!({ [part]: option }));
+      for (const seed of few) {
+        const own = openblob(seed, { design });
+        const drawn = limited.map((d) => openblob(seed, { design: d }));
+        expect(new Set(drawn).size).toBe(options.length);
+        // Exactly one option is the seed's own, and it draws exactly what the seed draws anyway
+        expect(drawn.filter((svg) => svg === own)).toHaveLength(1);
+        for (const svg of drawn) {
+          expect(svg).not.toMatch(LEAKS);
+          expect(svg).not.toMatch(/\{\w+\}|NaN|undefined|Infinity|null/);
+          expect(balanced(svg)).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("changes only the chosen part, so every option works in every mood", () => {
+    for (const [part, { options }] of parts) {
+      for (const mood of design.moods ?? []) {
+        for (const option of options) {
+          const d = design.with!({ [part]: option });
+          expect(openblob("Sam Porter", { design: d, mood })).toBe(openblob("Sam Porter", { design: d, mood }));
+        }
+      }
+    }
+  });
+
+  it("rejects parts and options it does not have", () => {
+    const [part] = parts[0];
+    expect(() => design.with!({ nope: "x" })).toThrow(/no part "nope"/);
+    expect(() => design.with!({ [part]: "nope" })).toThrow(/"nope" is not an option/);
+    expect(() => design.with!({ [part]: [] })).toThrow(/no option is allowed/);
+  });
+
   // Changing this snapshot redraws everyone who uses the design: only on purpose, in a major version.
   it("keeps its output", () => {
     for (const seed of ["Sam Porter", "01JD8X2K4PZ3", "李伟"]) expect(openblob(seed, { design })).toMatchSnapshot(seed);

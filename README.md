@@ -84,17 +84,28 @@ All of them draw the five moods, and a person keeps their features in every mood
 
 ![One seed in five moods, calm, happy, sleepy, surprised and busy: big as a blob, and small as a monster, a robot and a critter below each.](https://raw.githubusercontent.com/Hyzokaaa/openblobs/main/media/moods.svg)
 
-### Only some shapes or tops
+### Choosing parts
 
-`blobs.with()` keeps the blobs to the shapes or tops you choose, for example a headset for every support agent:
+Every design is made of named parts, and `with()` keeps them to the options you choose. A headset for every support agent, one-eyed monsters, robots without antennas:
 
 ```ts
 const agents = blobs.with({ top: "headset" });
+const cyclops = monsters.with({ eyes: "one" });
+const quiet = robots.with({ antenna: "none", mouth: ["line", "grille"] });
 
 openblob(agent.id, { design: agents });
 ```
 
-Each person keeps their colours, face and mood, so the agent is still recognisably the same blob. Seeds that already have an allowed top or shape draw exactly as before. Pass a list to choose among several: `blobs.with({ top: ["headset", "antenna"], shape: "bean" })`. Shapes are `blob`, `pebble`, `bean` and `drop`; tops are `none`, `antenna`, `sprout`, `tuft`, `headset` and `ears` (also exported as `SHAPES` and `TOPS`).
+Each person keeps everything else, so the agent is still recognisably the same blob, and seeds that already have an allowed option draw exactly as before. Pass a list to choose among several, and chain `with()` to add more. The parts and their options are typed, and listed in `design.parts`:
+
+| Design     | Parts |
+|------------|-------|
+| `blobs`    | `shape`, `top` |
+| `monsters` | `horns`, `body`, `eyes`, `mouth`, `cheeks` |
+| `robots`   | `ears`, `antenna`, `head`, `screen`, `eyes`, `mouth`, `lights` |
+| `critters` | `ears`, `head`, `markings`, `eyes`, `mouth`, `cheeks` |
+
+The [demo](https://hyzokaaa.github.io/openblobs/) points at every part of the avatar and draws its options on your seed: pick one and it writes the `with()` for you.
 
 Want to add a design? See [Contributing](CONTRIBUTING.md#adding-a-design): a design is one file of SVG parts, and the tests check the rest.
 
@@ -119,6 +130,17 @@ const monsters = layeredDesign({
 });
 
 openblob(user.id, { design: monsters });
+```
+
+Name a layer and its options, and `with()` can choose them; `at` says where the part sits, for pickers like the demo's to point at. Naming never changes what a seed draws, and an option can repeat to be drawn more often:
+
+```ts
+layers: [
+  { name: "horns", options: ["none", "none", "horns"], at: [28, 24], parts: ["", "", `<path .../>`] },
+  // ...
+]
+
+monsters.with({ horns: "horns" });
 ```
 
 Placeholders: `{body}`, `{ink}`, `{shade}`, `{gear}` (readable on light and dark pages), `{accent}`, `{blush}` and `{background}`. Pass `hues: [200, 220, 240]` to stay within your brand. The full monsters are in [`src/designs/monsters.ts`](src/designs/monsters.ts).

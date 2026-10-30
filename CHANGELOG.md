@@ -4,8 +4,16 @@
 
 ### Added
 
-- `blobs.with({ shape, top })` keeps the blobs to the shapes or tops you choose, one or a list: `blobs.with({ top: "headset" })` gives everyone a headset. Each person keeps their colours, face and mood, and seeds that already have an allowed shape or top draw exactly as before. `traitsOf(seed, choice)` takes the same choice. The default `blobs` draw as before: same `GENERATION`.
-- The demo has a Top picker for blobs, which shows `blobs.with({ top })` across the page and in the code, and opens on one with `?top=<top>`.
+- Every design has named parts, and `design.with()` keeps them to the options you choose: `blobs.with({ top: "headset" })`, `monsters.with({ eyes: "one" })`, `robots.with({ antenna: "none" })`. Each person keeps everything else, and seeds that already have an allowed option draw exactly as before. The choice is typed, `design.parts` lists the parts with their options and where they sit, and `traitsOf(seed, choice)` takes the blobs' choice.
+- `layeredDesign` layers can have a name, option names and a position: `{ name: "eyes", options: ["two", "one"], at: [40, 47], parts: [...] }`. Naming changes nothing a seed draws.
+- The demo opens on the character: dashed arrows point at each part, and on the other end its options are drawn on your seed, framed on the part. The seed's own options are marked; pick one to keep it for everyone and the code shows the `with()`. The address keeps the design, the parts and the mood, as in `?design=robots&antenna=none&mood=happy`.
+- The playground names layers (`# eyes`) and options (`dots: <svg>`), measures where each part sits, and its design file passes the tests as is.
+- Releases are automatic: every push to `main` with a `feat:`, `fix:` or breaking commit since the last tag publishes the next version to npm.
+
+### Changed
+
+- The bundled designs name their layers. Every avatar draws exactly as before: same snapshots, same `GENERATION`.
+- Designs in `src/designs` name their parts: the tests check that each option draws something different and leaves seeds that already have it unchanged.
 
 ## 0.2.0 (2026-10-29)
 
