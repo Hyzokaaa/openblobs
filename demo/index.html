@@ -44,7 +44,7 @@
   .icon-btn { border:1px solid var(--border); background:transparent; cursor:pointer; font:inherit; font-size:14px; }
 
   /* Hero */
-  .hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:56px; align-items:start; padding:56px 0 48px; }
+  .hero { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:56px; align-items:start; padding:56px 0 48px; }
   h1 { font-size:clamp(28px, 5vw, 40px); line-height:1.15; letter-spacing:-0.02em; margin:0 0 12px; }
   .lead { color:var(--muted); font-size:17px; margin:0 0 28px; max-width:46ch; }
   .field-label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
@@ -64,13 +64,55 @@
   .seg input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
   .seg span { display:block; padding:6px 12px; border-radius:7px; font-size:14px; color:var(--muted); cursor:pointer; }
   .seg label:hover span { color:var(--text); }
-  #topSeg span { padding:6px 9px; }
   .seg input:checked + span { background:var(--primary); color:var(--on-primary); }
   .seg input:focus-visible + span { outline:2px solid var(--focus); outline-offset:1px; }
 
-  .stage { display:flex; flex-wrap:wrap; align-items:flex-end; gap:24px; margin-top:8px; }
-  .stage-main { display:grid; place-items:center; width:208px; height:208px; border-radius:28px; background:var(--card); border:1px solid var(--border); }
-  .stage-main svg { display:block; width:144px; height:144px; }
+  /* Studio: the character in the middle, each part pointed at, its options drawn on the same seed */
+  .studio { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 172px minmax(0,1fr); align-items:center; gap:22px; padding:22px 14px; background:var(--card); border:1px solid var(--border); border-radius:24px; }
+  .studio-avatar { position:relative; z-index:0; width:172px; height:172px; }
+  .studio-avatar svg { display:block; width:100%; height:100%; }
+  .callouts { position:relative; z-index:2; display:flex; flex-direction:column; gap:14px; min-width:0; }
+  .studio.placed { align-items:start; }
+  .callouts.placed { display:block; }
+  .callouts.placed .callout { position:absolute; left:0; right:0; }
+  .callouts.left.placed .callout { display:flex; flex-direction:column; align-items:flex-end; }
+  .callouts.left { align-items:flex-end; }
+  .callout-label { display:flex; align-items:center; gap:6px; min-height:20px; margin-bottom:4px; font-size:12px; font-weight:600; }
+  .callouts.left .callout-label { justify-content:flex-end; }
+  .callout-label .val { color:var(--muted); font-weight:500; }
+  .unpin { display:inline-grid; place-items:center; width:18px; height:18px; padding:0; border:0; border-radius:50%; background:var(--primary-soft); color:var(--primary); font:inherit; font-size:13px; line-height:1; cursor:pointer; }
+  .unpin:hover { background:var(--primary); color:var(--on-primary); }
+  .swatches { display:flex; flex-wrap:wrap; gap:6px; max-width:114px; }
+  .callouts.left .swatches { justify-content:flex-end; }
+  .swatch { position:relative; width:32px; height:32px; padding:0; border:0; border-radius:50%; background:none; cursor:pointer; }
+  .swatch svg { display:block; width:32px; height:32px; border-radius:50%; transition:transform .15s; }
+  .swatch:hover svg { transform:scale(1.1); }
+  .swatch::after { content:""; position:absolute; inset:-4px; border:2px solid transparent; border-radius:50%; }
+  .swatch.is-current::after { border-color:var(--primary); border-style:dashed; }
+  .swatch[aria-pressed="true"]::after { border-style:solid; }
+  .swatch:focus-visible { outline:none; }
+  .swatch:focus-visible::after { border-color:var(--focus); border-style:solid; }
+  /* Where the seed would land, once another option is pinned */
+  .seed-dot { display:none; position:absolute; right:-3px; bottom:-3px; width:11px; height:11px; border-radius:50%; background:var(--card); border:2px solid var(--muted); }
+  .swatch.is-seed:not(.is-current) .seed-dot { display:block; }
+  .measure { position:absolute; width:100px; height:100px; visibility:hidden; pointer-events:none; }
+  .leaders { position:absolute; inset:0; z-index:1; width:100%; height:100%; overflow:visible; pointer-events:none; }
+  .leaders .leader { fill:none; stroke:var(--muted); stroke-width:1.5; stroke-dasharray:4 4; transition:stroke .15s; }
+  .leaders .leader.on { stroke:var(--primary); }
+  .leaders .start { fill:var(--muted); }
+  .leaders .start.on, .leaders .tip.on { fill:var(--primary); }
+  .leaders .tip { fill:var(--muted); }
+  .studio-foot { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:10px 2px 18px; }
+  .studio-foot .hint { margin:0; font-size:13px; }
+  .studio-foot .btn { height:32px; font-size:13px; flex-shrink:0; }
+  @media (max-width: 560px) {
+    .studio { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; }
+    .studio-avatar { grid-column:1 / -1; order:-1; margin:0 auto; width:150px; height:150px; }
+    .callouts.left { align-items:flex-start; }
+    .callouts.left .callout-label, .callouts.left .swatches { justify-content:flex-start; }
+    .swatches { max-width:none; }
+    .leaders { display:none; }
+  }
   .sizes { display:flex; align-items:flex-end; gap:14px; }
   .sizes figure { margin:0; text-align:center; color:var(--muted); font-size:12px; }
   .sizes svg { display:block; margin:0 auto 4px; }
@@ -87,8 +129,8 @@
   .side-label { margin:6px 0 -4px; padding-top:14px; border-top:1px solid var(--border); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
   .code-head { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; padding-top:4px; }
   .file { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; color:var(--muted); }
-  .snippet { margin:0; overflow:auto; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px; min-height:184px; font-size:13px; line-height:1.6; }
-  .code-tools { display:flex; align-items:center; gap:10px; }
+  .snippet { margin:0; overflow:auto; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px; min-height:184px; font-size:12.5px; line-height:1.6; }
+  .code-tools { display:flex; align-items:center; gap:10px; margin-left:auto; }
   .code-tools .btn { height:34px; font-size:13px; }
   .note { margin:0; font-size:13px; }
   .note code { font-size:12px; }
@@ -248,10 +290,18 @@
         </button>
       </div>
 
-      <div class="stage">
-        <div class="stage-main" id="big"></div>
-        <div class="sizes" id="sizes"></div>
+      <div class="studio" id="studio">
+        <div class="callouts left" id="calloutsLeft"></div>
+        <div class="studio-avatar" id="big"></div>
+        <div class="callouts right" id="calloutsRight"></div>
+        <svg class="leaders" id="leaders" aria-hidden="true"></svg>
+        <svg class="measure" id="measure" viewBox="0 0 100 100" aria-hidden="true"></svg>
       </div>
+      <div class="studio-foot">
+        <p class="muted hint">Every part starts from the seed. Pick one to keep it for everyone; pick it again to let the seed choose.</p>
+        <button class="btn" id="resetParts" type="button" hidden>From the seed</button>
+      </div>
+      <div class="sizes" id="sizes"></div>
     </div>
 
     <div class="hero-side" aria-label="Add it to your app">
@@ -269,14 +319,6 @@
       <fieldset>
         <legend>Background</legend>
         <div class="seg" id="bgSeg"></div>
-      </fieldset>
-      <fieldset id="topField">
-        <legend>Top <span class="count">blobs.with()</span></legend>
-        <div class="seg" id="topSeg"></div>
-      </fieldset>
-      <fieldset id="moodField">
-        <legend>Mood</legend>
-        <div class="seg" id="moodSeg"></div>
       </fieldset>
 
       <div class="code-head">
@@ -355,15 +397,21 @@ const $ = id => document.getElementById(id);
 const pick = list => list[Math.floor(Math.random() * list.length)];
 // Every design in src/designs shows up here on its own, in the order of the registry
 const DESIGNS = Object.fromEntries([blobs, ...designs].map(design => [design.name, design]));
-// Blobs limited to one top, made once per top: blobs.with({ top })
-const TOPPED = {};
-const designOf = (design, top = "any") =>
-  design !== "blobs" || top === "any" ? DESIGNS[design] : (TOPPED[top] ??= blobs.with({ top }));
-const avatar = (seed, { size, bg, mood, design, top }) =>
-  openblob(seed, { size, background: bg, mood: mood === "auto" ? undefined : mood, design: designOf(design, top) });
+// What the studio pinned: options per part of the current design, and a mood. Empty means "from the seed".
+const state = { pins: {}, mood: undefined };
+// The design limited to the pinned options, made once per combination
+const made = new Map();
+function designOf(name, pins = {}) {
+  const base = DESIGNS[name], entries = Object.entries(pins).sort();
+  if (!entries.length || !base.with) return base;
+  const key = name + JSON.stringify(entries);
+  if (!made.has(key)) made.set(key, base.with(pins));
+  return made.get(key);
+}
+const avatar = (seed, { size, bg, mood, design, pins }) =>
+  openblob(seed, { size, background: bg, mood, design: designOf(design, pins) });
 
 const BACKGROUNDS = [["circle", "Circle"], ["squircle", "Squircle"], ["none", "None"]];
-const TOPS = [["any", "Any"], ["none", "None"], ["antenna", "Antenna"], ["sprout", "Sprout"], ["tuft", "Tuft"], ["headset", "Headset"], ["ears", "Ears"]];
 const MOODS = [["auto", "From seed"], ["calm", "Calm"], ["happy", "Happy"], ["sleepy", "Sleepy"], ["surprised", "Surprised"], ["busy", "Busy"]];
 const NAMES = ["Sam Porter", "Carla Méndez", "Leo Martín", "Clara Pérez", "Ana López", "admin@example.net", "hello@example.com", "María José", "John Smith", "01JD8X2K4P", "Priya Natarajan", "Øyvind Hansen", "李伟", "Fatima Zahra", "Tom O'Brien", "Lucía Fernández", "Kenji Watanabe", "Olga Ivanova", "Pedro Sánchez", "Emma Wilson", "noreply@example.org", "Sven Berg", "Aisha Bello", "Diego Ramírez", "Chloé Martin", "Yusuf Kaya", "Nadia Petrov", "Raúl Costa", "Grace Hill", "Ada Lane", "Linus K.", "Marta Gil", "Hugo Duarte", "Iris Novak", "Pablo Ruiz", "Sara Cohen", "Ivan Horvat", "Elena Rossi", "Mateo Vargas", "Zoe Clarke"];
 const TEAM = [["Sam Porter", "Design", "online"], ["Carla Méndez", "Engineering", "online"], ["Clara Pérez", "Engineering", "away"], ["Carlos Pinto", "Product", "online"], ["Ana López", "Marketing", "offline"]];
@@ -392,11 +440,148 @@ function segmented(container, name, options, value) {
     `<label><input type="radio" name="${name}" value="${v}"${v === value ? " checked" : ""}><span>${label}</span></label>`).join("");
 }
 const choice = name => document.querySelector(`input[name="${name}"]:checked`).value;
-const opts = () => ({ design: choice("design"), bg: choice("bg"), mood: choice("mood"), top: choice("top") });
+const opts = () => ({ design: choice("design"), bg: choice("bg"), mood: state.mood, pins: state.pins });
+
+// The studio's parts, split between the two sides by where they sit, top to bottom on each
+const MOOD_AT = [50, 60];
+function callouts(design) {
+  const list = Object.entries(design.parts ?? {}).map(([key, part]) => ({ key, at: part.at ?? [50, 50], options: part.options }));
+  if (design.moods) list.push({ key: "mood", at: MOOD_AT, options: design.moods, mood: true });
+  const left = [], right = [];
+  for (const c of list) (c.at[0] < 50 || (c.at[0] === 50 && left.length <= right.length) ? left : right).push(c);
+  // Keep the sides even, moving the parts nearest the middle
+  const nearest = side => side.reduce((best, c) => (Math.abs(c.at[0] - 50) < Math.abs(best.at[0] - 50) ? c : best));
+  while (Math.abs(left.length - right.length) > 1) {
+    const [from, to] = left.length > right.length ? [left, right] : [right, left];
+    to.push(...from.splice(from.indexOf(nearest(from)), 1));
+  }
+  const byHeight = (a, b) => a.at[1] - b.at[1];
+  return [left.sort(byHeight), right.sort(byHeight)];
+}
+
+// A swatch shows its part up close: the avatar's 100 × 100 box, cropped around the point the part sits at
+// What changes between the options is the part: measure those elements and frame them, whatever the design
+const parser = new DOMParser();
+const elementsOf = svg => [...parser.parseFromString(svg, "image/svg+xml").documentElement.children].map(el => el.outerHTML);
+function partBox(svgs) {
+  const lists = svgs.map(elementsOf), shared = lists.slice(1).reduce((common, list) => common.filter(el => list.includes(el)), lists[0]);
+  const changed = [...new Set(lists.flat().filter(el => !shared.includes(el)))];
+  if (!changed.length) return [0, 0, 100, 100];
+  const measure = $("measure");
+  measure.innerHTML = changed.join("");
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const el of measure.children) {
+    const b = el.getBBox();
+    if (!b.width && !b.height) continue;
+    x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
+  }
+  measure.innerHTML = "";
+  if (x0 === Infinity) return [0, 0, 100, 100];
+  // A square around it, with room to breathe, kept inside the avatar
+  const side = Math.min(100, Math.max(40, Math.max(x1 - x0, y1 - y0) * 1.3));
+  const clamp = v => Math.min(100 - side, Math.max(0, v - side / 2));
+  return [clamp((x0 + x1) / 2), clamp((y0 + y1) / 2), side, side];
+}
+const closeUp = (svg, box) => svg.replace('viewBox="0 0 100 100"', `viewBox="${box.map(v => +v.toFixed(1)).join(" ")}"`);
+
+function renderStudio() {
+  const seed = $("seed").value, o = opts(), base = DESIGNS[o.design];
+  $("big").innerHTML = avatar(seed, { ...o, size: 172 });
+  const block = (c, side) => {
+    const pinned = c.mood ? o.mood : o.pins[c.key];
+    // Each option drawn on this seed, everything else as it is now; the seed's own is the one that changes nothing
+    let drawn, plain;
+    if (c.mood) {
+      const design = designOf(o.design, o.pins);
+      plain = openblob(seed, { design });
+      drawn = c.options.map(m => [m, openblob(seed, { design, mood: m })]);
+    } else {
+      const { [c.key]: _, ...others } = o.pins;
+      plain = openblob(seed, { design: designOf(o.design, others), mood: o.mood });
+      drawn = c.options.map(option => [option, openblob(seed, { design: designOf(o.design, { ...others, [c.key]: option }), mood: o.mood })]);
+    }
+    const own = drawn.find(([, svg]) => svg === plain)?.[0], current = pinned ?? own, box = partBox(drawn.map(([, svg]) => svg));
+    const swatches = drawn.map(([option, svg]) => {
+      const classes = ["swatch", option === current && "is-current", option === own && "is-seed"].filter(Boolean).join(" ");
+      const note = option === own ? ", from the seed" : "";
+      return `<button type="button" class="${classes}" data-key="${c.key}" data-option="${option}" aria-pressed="${option === pinned}" aria-label="${c.key}: ${option}${note}" title="${option}${note}">${closeUp(svg, box)}<span class="seed-dot" aria-hidden="true"></span></button>`;
+    }).join("");
+    const unpin = pinned ? `<button class="unpin" type="button" data-key="${c.key}" aria-label="Let the seed choose the ${c.key}" title="From the seed">×</button>` : "";
+    const label = side === "left" ? `${unpin}<span>${c.key}</span><span class="val">${current}</span>` : `<span>${c.key}</span><span class="val">${current}</span>${unpin}`;
+    return `<div class="callout" data-key="${c.key}" data-side="${side}"><div class="callout-label" id="part-${c.key}">${label}</div><div class="swatches" role="group" aria-labelledby="part-${c.key}">${swatches}</div></div>`;
+  };
+  const [left, right] = callouts(base);
+  $("calloutsLeft").innerHTML = left.map(c => block(c, "left")).join("");
+  $("calloutsRight").innerHTML = right.map(c => block(c, "right")).join("");
+  $("resetParts").hidden = !Object.keys(o.pins).length && !o.mood;
+  placeCallouts();
+  drawLeaders();
+}
+
+// Dashed leaders from each part's options to the point it sits at, with an arrow on the character
+const atOf = key => (key === "mood" ? MOOD_AT : DESIGNS[choice("design")].parts?.[key]?.at ?? [50, 50]);
+
+// Each callout as close as it fits to the height of its part, so the leaders run almost level and never cross
+function placeCallouts() {
+  const columns = [$("calloutsLeft"), $("calloutsRight")];
+  const stacked = getComputedStyle($("leaders")).display === "none";
+  const face = $("big");
+  columns.forEach(col => { col.classList.remove("placed"); col.style.height = ""; col.querySelectorAll(".callout").forEach(el => { el.style.top = ""; }); });
+  face.style.marginTop = "";
+  $("studio").classList.remove("placed");
+  if (stacked) return;
+  // Measured with the character's top at 0: each callout centred on its part, pushed down past the one above,
+  // then the whole column moved back up so that, on average, it sits where its parts are
+  const GAP = 12, size = face.offsetHeight;
+  const layouts = columns.map(col => {
+    const items = [...col.querySelectorAll(".callout")].map(el => ({ el, h: el.offsetHeight, ideal: (atOf(el.dataset.key)[1] / 100) * size }));
+    let y = -Infinity;
+    for (const it of items) { it.top = Math.max(it.ideal - it.h / 2, y); y = it.top + it.h + GAP; }
+    const shift = items.reduce((sum, it) => sum + (it.ideal - (it.top + it.h / 2)), 0) / (items.length || 1);
+    for (const it of items) it.top += shift;
+    return items;
+  });
+  // Whatever rises above the character pushes everything down by as much; the columns get the height they use
+  const all = layouts.flat(), lift = Math.max(0, ...all.map(it => -it.top));
+  const height = Math.max(size, ...all.map(it => it.top + it.h)) + lift;
+  $("studio").classList.add("placed");
+  face.style.marginTop = `${lift}px`;
+  layouts.forEach((items, i) => {
+    columns[i].classList.add("placed");
+    columns[i].style.height = `${height}px`;
+    for (const it of items) it.el.style.top = `${it.top + lift}px`;
+  });
+}
+
+function drawLeaders() {
+  const svg = $("leaders"), box = $("studio").getBoundingClientRect(), face = $("big").getBoundingClientRect();
+  if (!face.width || getComputedStyle(svg).display === "none") return;
+  const lines = [...document.querySelectorAll("#studio .callout")].map(el => {
+    const key = el.dataset.key, at = atOf(key);
+    const r = el.querySelector(".swatches").getBoundingClientRect(), left = el.dataset.side === "left";
+    const sx = (left ? r.right + 10 : r.left - 10) - box.left, sy = r.top + r.height / 2 - box.top;
+    const ex = face.left + (at[0] / 100) * face.width - box.left, ey = face.top + (at[1] / 100) * face.height - box.top;
+    const d = `M${sx.toFixed(1)} ${sy.toFixed(1)}H${(sx + (left ? 12 : -12)).toFixed(1)}L${ex.toFixed(1)} ${ey.toFixed(1)}`;
+    const on = el.matches(":hover, :focus-within") || Boolean(el.querySelector('[aria-pressed="true"]')) ? " on" : "";
+    return `<path class="leader${on}" d="${d}" marker-end="url(#${on ? "tip-on" : "tip"})"/><circle class="start${on}" cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="2.5"/>`;
+  });
+  const marker = (id, on) => `<marker id="${id}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path class="tip${on}" d="M0 .5 9 5 0 9.5z"/></marker>`;
+  svg.innerHTML = `<defs>${marker("tip", "")}${marker("tip-on", " on")}</defs>` + lines.join("");
+}
+
+// The address keeps the design, the pinned parts and the mood, so a look can be shared
+function syncUrl() {
+  const p = new URLSearchParams(), o = opts();
+  if (o.design !== "blobs") p.set("design", o.design);
+  for (const [key, option] of Object.entries(o.pins)) p.set(key, option);
+  if (o.mood) p.set("mood", o.mood);
+  const query = p.toString();
+  history.replaceState(null, "", query ? `?${query}` : location.pathname);
+}
 
 function renderPreview() {
   const seed = $("seed").value, o = opts();
-  $("big").innerHTML = avatar(seed, { ...o, size: 160 });
+  renderStudio();
   $("sizes").innerHTML = [20, 24, 32, 48, 64].map(px => `<figure>${avatar(seed, { ...o, size: px })}<figcaption>${px}</figcaption></figure>`).join("");
   $("moods").innerHTML = MOODS.slice(1).map(([m, label]) => `<figure>${avatar(seed, { ...o, mood: m, size: 72 })}<figcaption>${label}</figcaption></figure>`).join("");
   document.querySelectorAll(".cell").forEach(c => c.setAttribute("aria-current", c.dataset.seed === seed ? "true" : "false"));
@@ -405,11 +590,7 @@ function renderPreview() {
 
 function renderAll() {
   const o = opts();
-  // Moods only for designs that draw them
   const faces = Boolean(DESIGNS[o.design].moods);
-  $("moodField").disabled = !faces;
-  // Tops belong to the blobs
-  $("topField").hidden = o.design !== "blobs";
   // Keep the chosen design in view in its row
   const strip = $("designSeg"), chosen = strip.querySelector("input:checked").closest(".design-opt");
   if (chosen.offsetLeft < strip.scrollLeft || chosen.offsetLeft + chosen.offsetWidth > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = chosen.offsetLeft - 2;
@@ -438,17 +619,20 @@ const camel = name => name.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
 const MANAGERS = [["npm", "npm install"], ["pnpm", "pnpm add"], ["yarn", "yarn add"], ["bun", "bun add"]];
 const FRAMEWORKS = [["react", "React", "Avatar.tsx"], ["js", "JavaScript", "avatar.js"], ["uri", "Any framework", "avatar.js"]];
 
-function snippetFor(framework, { design, bg, mood, top }, seed) {
+function snippetFor(framework, { design, bg, mood, pins }, seed) {
   const lines = [], quoted = JSON.stringify(seed || "?"), id = camel(design);
-  const options = [], topped = design === "blobs" && top !== "any";
-  if (design !== "blobs") options.push(["design", id]);
-  if (topped) options.push(["design", "myBlobs"]);
+  const pinned = Object.entries(pins ?? {}), mine = pinned.length ? `my${id[0].toUpperCase()}${id.slice(1)}` : null;
+  const options = [];
+  if (mine) options.push(["design", mine]);
+  else if (design !== "blobs") options.push(["design", id]);
   if (bg !== "circle") options.push(["background", JSON.stringify(bg)]);
-  if (mood !== "auto" && DESIGNS[design].moods) options.push(["mood", JSON.stringify(mood)]);
+  if (mood && DESIGNS[design].moods) options.push(["mood", JSON.stringify(mood)]);
   const designImport = design === "blobs" ? [] : [`import { ${id} } from "openblobs/designs/${design}";`];
   // Made once, outside any component, so it is not redrawn on every render
-  const made = topped ? ["", `const myBlobs = blobs.with({ top: ${JSON.stringify(top)} });`] : [];
-  const core = names => (topped ? ["blobs", ...names] : names).sort();
+  // One line while it fits the panel, one option per line after that
+  const choice = pinned.map(([k, v]) => `${k}: ${JSON.stringify(v)}`), oneLine = `const ${mine} = ${id}.with({ ${choice.join(", ")} });`;
+  const made = !mine ? [] : oneLine.length <= 44 ? ["", oneLine] : ["", `const ${mine} = ${id}.with({`, ...choice.map(c => `  ${c},`), "});"];
+  const core = names => (mine && design === "blobs" ? ["blobs", ...names] : names).sort();
   const coreImport = names => core(names).length ? [`import { ${core(names).join(", ")} } from "openblobs";`] : [];
 
   if (framework === "react") {
@@ -511,31 +695,59 @@ function renderDesignTeams(o) {
 }
 
 // Playground: parts in plain text, drawn with layeredDesign as you type
-const STARTER = `# Bodies: one part per line, in a 100 × 100 box
-<circle cx="50" cy="54" r="30" fill="{body}"/>
-<rect x="22" y="26" width="56" height="56" rx="18" fill="{body}"/>
+const STARTER = `# body: one part per line, in a 100 × 100 box; "name: <svg>" names the option
+round: <circle cx="50" cy="54" r="30" fill="{body}"/>
+square: <rect x="22" y="26" width="56" height="56" rx="18" fill="{body}"/>
 ---
-# Eyes
-<circle cx="40" cy="50" r="4.5" fill="{ink}"/><circle cx="60" cy="50" r="4.5" fill="{ink}"/>
-<path d="M35 50h10M55 50h10" stroke="{ink}" stroke-width="3.4" stroke-linecap="round"/>
+# eyes
+dots: <circle cx="40" cy="50" r="4.5" fill="{ink}"/><circle cx="60" cy="50" r="4.5" fill="{ink}"/>
+lines: <path d="M35 50h10M55 50h10" stroke="{ink}" stroke-width="3.4" stroke-linecap="round"/>
 ---
-# Mouths: (none) draws nothing for some seeds
-<path d="M43 63q7 6 14 0" stroke="{ink}" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+# mouth: (none) draws nothing for some seeds
+smile: <path d="M43 63q7 6 14 0" stroke="{ink}" stroke-width="3.4" stroke-linecap="round" fill="none"/>
 (none)
 ---
-# Hats
+# hat
 (none)
-<path d="M50 25v-9" stroke="{gear}" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="13" r="4.5" fill="{accent}"/>
+antenna: <path d="M50 25v-9" stroke="{gear}" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="13" r="4.5" fill="{accent}"/>
 `;
 // Same rule as the tests: inline SVG must not leak into the page
 const LEAKS = /\bid=|<style|<script|<foreignObject|<image|<use\b|<filter|<mask|<clipPath|Gradient|\bhref=|url\(|\bon\w+=/i;
 const COLOURS = ["body", "ink", "shade", "gear", "accent", "background", "blush"];
 
+// Blocks between "---" lines are layers. "# eyes" names one; "dots: <svg>" names an option; "(none)" draws nothing.
+const slug = text => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 function parseParts(text) {
-  return text.split(/^\s*---\s*$/m)
-    .map(block => block.split("\n").map(line => line.trim()).filter(line => line && !line.startsWith("#"))
-      .map(line => (line === "(none)" ? "" : line)))
-    .filter(layer => layer.length);
+  const taken = new Set();
+  return text.split(/^\s*---\s*$/m).map(block => {
+    const lines = block.split("\n").map(line => line.trim()).filter(Boolean);
+    const heading = lines.find(line => line.startsWith("#"));
+    let name = slug(heading?.slice(1).split(":")[0] ?? "") || "layer";
+    for (let n = 2; taken.has(name); n++) name = name.replace(/-\d+$/, "") + "-" + n;
+    const options = [], parts = [];
+    for (const line of lines.filter(line => !line.startsWith("#"))) {
+      const m = line.match(/^([\w -]+):\s*(<.*)$/);
+      if (line === "(none)") options.push("none"), parts.push("");
+      else options.push(slug(m?.[1] ?? "") || `${name}-${parts.length + 1}`), parts.push(m ? m[2] : line);
+    }
+    if (parts.length) taken.add(name);
+    return { name, options, parts };
+  }).filter(layer => layer.parts.length);
+}
+
+// Where a layer's parts sit, measured in the page, so the demo's arrows can point at them
+function centreOf(parts) {
+  const measure = $("measure");
+  measure.innerHTML = parts.join("");
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const el of measure.querySelectorAll("*")) {
+    if (typeof el.getBBox !== "function") continue;
+    const b = el.getBBox();
+    if (!b.width && !b.height) continue;
+    x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
+  }
+  measure.innerHTML = "";
+  return x0 === Infinity ? [50, 50] : [Math.round((x0 + x1) / 2), Math.round((y0 + y1) / 2)];
 }
 
 function designFile(name, layers) {
@@ -546,14 +758,21 @@ export const ${camel(name)} = layeredDesign({
   name: "${name}",
   description: "One line on what it draws.",
   layers: [
-${layers.map(layer => `    [${layer.map(literal).join(", ")}],`).join("\n")}
+${layers.map(layer => `    {
+      name: ${JSON.stringify(layer.name)},
+      options: [${layer.options.map(o => JSON.stringify(o)).join(", ")}],
+      at: [${centreOf(layer.parts).join(", ")}],
+      parts: [
+${layer.parts.map(part => `        ${literal(part)},`).join("\n")}
+      ],
+    },`).join("\n")}
   ],
 });
 `;
 }
 
 function renderPlay() {
-  const layers = parseParts($("parts").value), name = $("designName").value.trim(), parts = layers.flat();
+  const layers = parseParts($("parts").value), name = $("designName").value.trim(), parts = layers.flatMap(layer => layer.parts);
   const unknown = [...parts.join("").matchAll(/\{(\w+)\}/g)].map(m => m[1]).find(key => !COLOURS.includes(key));
   const error = !layers.length ? "Add at least one part."
     : parts.some(part => LEAKS.test(part)) ? "Ids, styles, gradients, filters, scripts and links leak into the page: the tests turn them away."
@@ -561,7 +780,7 @@ function renderPlay() {
     : !/^[a-z][a-z0-9-]{1,30}$/.test(name) ? "The name takes lower-case letters, digits and dashes."
     : "";
   if (layers.length) {
-    const design = layeredDesign({ name: "playground", layers });
+    const design = layeredDesign({ name: "playground", layers: layers.map(({ parts }) => parts) });
     // As <img>, so whatever is typed here never runs on the page
     $("playGrid").innerHTML = NAMES.slice(0, 12).map(n => `<img src="${openblobUri(n, { design, background: choice("bg") })}" alt="">`).join("");
   }
@@ -633,17 +852,52 @@ copier($("copyBtn"), $("snippet"));
 copier($("copyInstall"), $("installCmd"));
 copier($("copyDesignBtn"), $("designSnippet"));
 
-// ?design=monsters opens the demo on that design, and ?top=headset on blobs with that top, handy to link from a pull request
-const wanted = new URLSearchParams(location.search).get("design");
+// ?design=monsters opens the demo on that design, handy to link from a pull request; ?eyes=one&mood=happy pins parts too
+const params = new URLSearchParams(location.search), wanted = params.get("design");
 designOptions(Object.hasOwn(DESIGNS, wanted ?? "") ? wanted : "blobs");
+const opening = DESIGNS[choice("design")];
+for (const [key, part] of Object.entries(opening.parts ?? {})) if (part.options.includes(params.get(key))) state.pins[key] = params.get(key);
+if (opening.moods?.includes(params.get("mood"))) state.mood = params.get("mood");
 segmented($("bgSeg"), "bg", BACKGROUNDS, "circle");
 segmented($("pmSeg"), "pm", MANAGERS.map(([id]) => [id, id]), recall("openblobs-pm", "npm", MANAGERS.map(([id]) => id)));
 segmented($("fwSeg"), "fw", FRAMEWORKS.map(([id, label]) => [id, label]), recall("openblobs-fw", "react", FRAMEWORKS.map(([id]) => id)));
 ["pmSeg", "fwSeg"].forEach(id => $(id).addEventListener("change", renderCode));
-segmented($("moodSeg"), "mood", MOODS, "auto");
-const wantedTop = new URLSearchParams(location.search).get("top");
-segmented($("topSeg"), "top", TOPS, TOPS.some(([v]) => v === wantedTop) ? wantedTop : "any");
-["designSeg", "bgSeg", "moodSeg", "topSeg"].forEach(id => $(id).addEventListener("change", renderAll));
+$("bgSeg").addEventListener("change", renderAll);
+// Pins belong to a design's parts: a new design starts from the seed again
+$("designSeg").addEventListener("change", () => {
+  state.pins = {};
+  if (!DESIGNS[choice("design")].moods) state.mood = undefined;
+  renderAll();
+  syncUrl();
+});
+
+// Studio: a swatch pins its option for everyone, or lets the seed choose again
+$("studio").addEventListener("click", e => {
+  const target = e.target.closest(".swatch, .unpin");
+  if (!target) return;
+  const { key, option } = target.dataset, pinned = key === "mood" ? state.mood : state.pins[key];
+  const next = target.classList.contains("unpin") || pinned === option ? undefined : option;
+  if (key === "mood") state.mood = next;
+  else {
+    state.pins = { ...state.pins };
+    if (next) state.pins[key] = next; else delete state.pins[key];
+  }
+  renderAll();
+  syncUrl();
+  (document.querySelector(`.swatch[data-key="${key}"][data-option="${option ?? next}"]`) ?? document.querySelector(`.swatch[data-key="${key}"]`))?.focus({ preventScroll: true });
+  announce(next ? `${key}: ${next}, for everyone` : `${key}: from the seed`);
+});
+$("resetParts").addEventListener("click", () => {
+  state.pins = {};
+  state.mood = undefined;
+  renderAll();
+  syncUrl();
+  announce("Every part from the seed");
+});
+["pointerover", "pointerout", "focusin", "focusout"].forEach(type => $("studio").addEventListener(type, () => requestAnimationFrame(drawLeaders)));
+new ResizeObserver(() => drawLeaders()).observe($("studio"));
+// Narrow screens stack the parts under the character; wide ones place them again
+matchMedia("(max-width: 560px)").addEventListener("change", () => { placeCallouts(); drawLeaders(); });
 let draft = null;
 try { draft = localStorage.getItem("openblobs-parts"); } catch {}
 $("parts").value = draft || STARTER;
