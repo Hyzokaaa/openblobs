@@ -11,10 +11,11 @@ const arm = (x: number, y: number, bar: number, width: number) =>
 const spines = (d: string) => `<path d="${d}" stroke="{shade}" stroke-width="2.6" stroke-linecap="round"/>`;
 const petals = [[0, -4.2], [4, -1.3], [2.5, 3.4], [-2.5, 3.4], [-4, -1.3]]
   .map(([x, y]) => `<circle cx="${58 + x}" cy="${30 + y}" r="3.3" fill="#f78fb3"/>`).join("");
-// Worn low enough to sit on the tall body and on the round one alike
-const hat = `<path d="M38.5 30.5c-1-7.5 0-14 3.6-16 2.8-1.5 5 1 7.9 1s5.1-2.5 7.9-1c3.6 2 4.6 8.5 3.6 16z" fill="#9a6a44"/>`
-  + `<path d="M38.4 26.6h23.2l-.3 3.6H38.7z" fill="#3d2a1d"/>`
-  + `<path d="M26 28.5c4 3.5 10.5 5 24 5s20-1.5 24-5c-.8 5-9.5 8.5-24 8.5s-23.2-3.5-24-8.5z" fill="#7d5233"/>`;
+// Worn low and wide enough to cover the top of the tall body and of the round one alike
+const hat = `<path d="M33.5 37c-1-10 1.8-19.8 7-22.8 3-1.8 5.6 1 9.5 1s6.5-2.8 9.5-1c5.2 3 8 12.8 7 22.8z" fill="#a0703f"/>`
+  + `<path d="M45 17.6q5 3.2 10 0" stroke="#7a4e2b" stroke-width="1.6" stroke-linecap="round" fill="none"/>`
+  + `<path d="M34.1 30.5h31.8l.4 5H33.7z" fill="#4a2f1b"/>`
+  + `<path d="M22 28.6c1.5-1 3-.8 4.2.6C31 34 39.5 35.5 50 35.5s19-1.5 23.8-6.3c1.2-1.4 2.7-1.6 4.2-.6.8 5.5-9.5 12-28 12s-28.8-6.5-28-12z" fill="#8a5a32"/>`;
 
 export const cacti = layeredDesign({
   name: "cacti",
